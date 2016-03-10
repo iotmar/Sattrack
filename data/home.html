@@ -1,0 +1,119 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Satellite tracker</title>
+<link href="w3.css" rel="stylesheet" type="text/css">
+<script src="/microajax.js"></script>
+</head>
+
+<body>
+
+<div class="w3-topnav w3-large w3-blue">
+  <a href="/home.html" onclick="return sclose();">Home</a>
+  <a href="/settings.html" onclick="return sclose();">Settings</a>
+  <a href="/links.html" onclick="return sclose();">Links</a>
+  <a href="/about.html" onclick="return sclose();">About</a>
+</div>
+
+<div class="w3-container w3-left-align" >
+<h1 class="w3-center" id="sat">Satellite tracker</h1>
+<table style="max-width:650px;table-layout:fixed;font-weight:normal;" align="center">
+<tr><th>Latitude:</th><td id="lat">-</td><th>Longitude:</th><td id="lon">-</td><th>Altitude:</th><td id="alt">-</td></tr>
+<tr><th>Azimuth:</th><td id="az">-</td><th>Elevation:</th><td id="el">-</td><th>Distance:</th><td id="dist">-</td></tr>
+<tr><th>Visible:</th><td id="vis">-</td><th>Time:</th><td id="time">-</td><th>Connection:</th><td id="con">Pending</td></tr>
+</table>
+</div>
+<hr>
+
+<div class="w3-container w3-center" >
+<h4>Overpass predictions</h4>
+<p>
+<table id="pass" class="w3-table w3-striped w3-card-4 w3-centered" style="max-width: 750px" align="center">
+<thead>
+    <tr class="w3-blue">
+      <th>Date</th>
+      <th>Starttime</th>
+      <th>Azimuth</th>
+      <th>Max.time</th>
+      <th>Elevation</th>
+      <th>Endtime</th>
+      <th>Azimuth</th>
+      <th>Visible</th>
+    </tr>
+</thead>
+<tbody><tr><th></th></tr></tbody>
+</table>
+
+<div class="w3-padding-large" >
+<input type="hidden" id="pre" value="0">
+<a href="#" onclick="return calc('pre')">&lt;&lt;</a>
+<a href="#" onclick="setValues('/data'); return false;">Now</a>
+<input type="hidden" id="next" value="0">
+<a href="#" onclick="return calc('next')">&gt;&gt;</a>
+</div>
+
+</p>
+</div>
+<hr>
+
+<div class="w3-container w3-center" >
+<h4>Two line element </h4>
+<div class="w3-code w3-card-4" style="white-space:pre;margin-left:auto;margin-right:auto;display:inline-block;"><div id="line1"></div><div id="line2"></div></div>
+<p><b>Epoch: </b><span id="epoch"></span></p>
+</div>
+
+</body>
+<script>
+window.onload=function (){
+	var a=new ArrayBuffer(4);
+	var b=new Uint8Array(a);
+	var c=new Uint32Array(a);
+	b[0]=0xa1;b[1]=0xb2;b[2]=0xc3;b[3]=0xd4;
+	en=(c[0]===0xd4c3b2a1);
+	
+	function inner(e,n){document.getElementById(e).innerHTML=n;}
+	
+	setValues("/data");
+	sock = new WebSocket('ws://'+location.hostname+':81/');
+	sock.binaryType='arraybuffer';
+	sock.onmessage=function (e){
+		sock.send(1);
+		var da=e.data;
+		var dv=new DataView(da);
+		if (dv.byteLength == 1){setTimeout(function e(){setValues("/data");},Math.random()*5000);return;}
+		function get(e,n,l){inner(e,dv.getFloat64(n,en).toFixed(2).toString()+l);}
+		get('lon',0,'°');
+		get('lat',8,'°');
+		get('alt',16,' km');
+		get('az',24,'°');
+		get('el',32,'°');
+		get('dist',40,' km');
+		var vis;
+		switch(dv.getInt16(48,en)){case 0:vis="Eclipsed";break;case -2:vis="Not visible";break;case -1:vis="Daylight";break;default:vis="Visible";}
+		inner('vis',vis);
+		var dt=new Date(dv.getFloat64(50,en));
+		dt=dt.toTimeString().split(' ');
+		inner('time',dt[0]);
+	}
+	sock.onclose=function(){inner('con','Closed');}
+	sock.onopen=function(){inner('con','Running');}
+	sock.onerror=function(){inner('con','Error');sock.close();}
+}
+
+function calc(e){
+	var n = document.getElementById(e).value;
+	if ( n != "0"){
+		setValues('/data?'+e+"="+n);
+	}
+	return false;
+}
+
+function sclose(){
+	if(event.button==0){
+		sock.close();
+	}
+	return true;
+}
+</script>
+</html>
