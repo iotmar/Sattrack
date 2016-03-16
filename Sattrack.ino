@@ -181,7 +181,7 @@ void loop() {
                 Serial.println("Can't get data");
                 Serial.println();
               #endif
-              LedStrip.SetAnimColor(0x9f,0x0,0x0);
+              LedStrip.SetAnimColor(0x0,0x0,0x0,0x9f,0x0,0x0);
               LedStrip.AnimStart(ANIM_WAIT);
               dataError = true;
               updatejdtime = jd + 0.000694;   // retry update in 1 min
@@ -239,6 +239,8 @@ void ColorCalc(double jd,double satEl,int16_t satVis){
     }else{
       brightness = (passPredictions[0].jdstop-jd)/(passPredictions[0].jdstop-passPredictions[0].jdmax);
     }
+    if (brightness < 0.0){brightness = 0.0;}
+    if (brightness > 1.0){brightness = 1.0;}
     Color = RgbColor::LinearBlend(RgbColor(0,0,0), Color, brightness); 
   }
 
