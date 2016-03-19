@@ -157,7 +157,7 @@ bool getTle(int ide, bool forceupdate){
     #endif
     bool satupdate = sat.init(naam,longstr1,longstr2);
     if( satupdate || forceupdate ){
-      predError = predictPasses();
+      predError = !predictPasses();
       uint8_t buf[]="n";webSocket.broadcastBIN(buf,1); ///update websites
     }
     

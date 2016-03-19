@@ -1,3 +1,5 @@
+This is an experimental branch that use asynchronic TCP.
+
 # Sattrack
 Sattrack is a small device that sits on your desk, and warn you when the Iss is overflying. It does this by using the Simplified perturbations model (SGP4) for calculating the current position of the satellite. This code is made for the ESP8266 and use the [arduino-core](https://github.com/esp8266/Arduino).
 
@@ -10,8 +12,10 @@ Sattrack is a small device that sits on your desk, and warn you when the Iss is 
 
 # External libraries
 - [Sgp4-Library](https://github.com/Hopperpop/Sgp4-Library)
-- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) by Links2004
+- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) by Links2004 (note: Enable AsyncTCP)
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) by Makuna
+- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) by me-no-dev
+- [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) by me-no-dev
 
 # Installation instructions
 - Install the arduino-core for the ESP8266 (recommended version: staging 2.1.0-rc1).

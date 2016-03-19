@@ -1,6 +1,10 @@
+
+#include <ESPAsyncWebServer.h>
+#include <ESPAsyncTCP.h>
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <ESP8266WebServer.h>
+//#include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <Sgp4.h>
@@ -90,8 +94,6 @@ void setup() {
     #endif
   }
   #endif
-  MDNS.addService("http", "tcp", 80);
-  MDNS.addService("ws", "tcp", 81);
 
   ///get tle and time
   UDPNTPClient.begin(2390);
@@ -101,7 +103,7 @@ void setup() {
           Serial.println("Can't get data");
           Serial.println();
         #endif
-        LedStrip.SetAnimColor(0x9f,0x0,0x0, 0x0,0x0,0x0);
+        LedStrip.SetAnimColor(0x0,0x0,0x0,0x9f,0x0,0x0);
         LedStrip.AnimStart(ANIM_WAIT);
         dataError = true;
         updatejdtime = getJulianTime() + 0.000694;   // retry update in 1 min
@@ -136,7 +138,7 @@ void loop() {
   double jd = getJulianTime();
   
   if(!dataError){
-    webSocket.loop();
+    //webSocket.loop();
     sat.findsat(jd);   //find satellite position on system time
   
     if ( sat.satEl > 0.0 ){   ///aboven horizon => display
@@ -149,8 +151,8 @@ void loop() {
           strip.Show();
         }
         
-        if (passPredictions[0].jdstop <= jd && predError){  //pred next past
-             predError = updatePasses();
+        if (passPredictions[0].jdstop <= jd && !predError){  //pred next past
+             predError = !updatePasses();
              uint8_t buf[]="n";webSocket.broadcastBIN(buf,1);
         }
   
@@ -171,7 +173,7 @@ void loop() {
         socketrate = millis();
         webSocketSendData();
     }
-    webSocket.loop();
+    //webSocket.loop();
     
   }
   else if(WiFi.getMode() != WIFI_AP){  ///retry when failed getting data
@@ -192,7 +194,45 @@ void loop() {
       }
   }
   
-  server.handleClient();
+  ///calculate prediction requests///
+  
+  if (PredictRequest != NULL){   
+      int params = PredictRequest->params();
+      if (params > 0 && !predError){   ///check for extra arguments
+          
+          char *ptr;
+          bool err;
+          uint32_t unix = strtoul(PredictRequest->getParam(0)->value().c_str(),&ptr,10);  ///read unix time
+          double jdC = getJulianFromUnix(unix);
+    
+          ///recalc new predictions
+          LedStrip.AnimStart(ANIM_WAIT);
+          
+          passinfo Predictions[pred_size];
+
+          #ifdef DEBUG
+             Serial.println("Prediction request: " + PredictRequest->getParam(0)->name() + " " + PredictRequest->getParam(0)->value());
+          #endif
+          
+          if (PredictRequest->getParam(0)->name() == "pre"){
+              err = !predictPasses(Predictions,jdC, true);
+          }else if (PredictRequest->getParam(0)->name() == "next"){
+              err = !predictPasses(Predictions,jdC, false);
+          }else{
+              err = true;   //no correct arguments
+          }
+  
+          LedStrip.AnimStop();
+          senddata(PredictRequest,Predictions,err);  /// send new prediction
+          
+      }else{
+        senddata(PredictRequest,passPredictions,false);  /// send normal prediction
+      }
+
+      PredictRequest = NULL;
+  }
+  
+  //server.handleClient();
   
 
   #ifdef DEBUG_frame
@@ -232,7 +272,7 @@ void ColorCalc(double jd,double satEl,int16_t satVis){
       Color = RgbColor::LinearBlend(eclipsed, visible, satVis/1000.0);     
   }
 
-  if (jd <= passPredictions[0].jdstop+0.0001 && jd >= passPredictions[0].jdstart-0.0001 && predError){
+  if (jd <= passPredictions[0].jdstop+0.0001 && jd >= passPredictions[0].jdstart-0.0001 && !predError){
     float brightness;
     if (jd <= passPredictions[0].jdmax){
       brightness = (jd-passPredictions[0].jdstart)/(passPredictions[0].jdmax-passPredictions[0].jdstart);

@@ -11,7 +11,7 @@ const char* host = "Sattrack";
 const char* ap_password = "12345";
 
 
-ESP8266WebServer server(80);
+AsyncWebServer server(80);
 WebSocketsServer webSocket(81);
 Sgp4 sat;
 WiFiUDP UDPNTPClient;
@@ -29,6 +29,8 @@ str3 monstr[13];
 
 passinfo passPredictions[pred_size];
 
+AsyncWebServerRequest *PredictRequest = NULL;
+
 #ifdef DEBUG
   
   Ticker ticker;
@@ -44,5 +46,5 @@ passinfo passPredictions[pred_size];
 
 /////Flags//////
 
-bool predError = true;
+bool predError = false;
 bool dataError = false;
