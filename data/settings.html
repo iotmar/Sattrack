@@ -16,24 +16,22 @@
   <a href="/about.html">About</a>
 </div>
 
-<div class="w3-row-padding w3-margin-top w3-centered">
+<div class="w3-margin-top w3-center">
 
-<div class="w3-third" style="width:450px">
+<div class="settings w3-left-align">
 	<header class="w3-container w3-blue">
     <h4>Network</h4>
     </header>
     
 	<form class="w3-container w3-card-4" style="min-height:580px" method="post" action="">
     	<input type="hidden" name="id" value="1">
-    	<br>
-		<fieldset>
-			<legend><h4 style="padding:0px 4px;">Wifi</h4></legend>
+		<fieldset class="w3-margin-top">
+			<legend><h4>Wifi</h4></legend>
 			<div><input class="w3-input" type="text" id="SSID" name="SSID" maxlength="31" required><label class="w3-label w3-validate">SSID</label></div>
 			<div><input class="w3-input" type="password" id="PSK" name="PSK" maxlength="63" required><label class="w3-label w3-validate">Password</label></div>
 		</fieldset>
-		<br>
-		<fieldset>
-			<legend><h4 style="padding:0px 4px;">Advanced</h4></legend>
+		<fieldset class="w3-margin-top">
+			<legend><h4>Advanced</h4></legend>
     		
     		<label><input type="checkbox" id="DHCP" name="DHCP"> DHCP</label>
     		<table>
@@ -42,49 +40,42 @@
     		<tr><td>Gateway:</td><td><input type="number" id="gw_0" name="gw_0" min="0" max="255"></td><td>.</td><td><input type="number" id="gw_1" name="gw_1" min="0" max="255"></td><td>.</td><td><input type="number" id="gw_2" name="gw_2" min="0" max="255"></td><td>.</td><td><input type="number" id="gw_3" name="gw_3" min="0" max="255"></td></tr>
     		</table>
 		</fieldset>
-
-		<br>
+        <br>
 		<button type="summit" class="w3-btn w3-blue w3-center">Save and restart</button>
-		<br><br>
 	</form>
 </div>
 
-<div class="w3-third" style="width:450px">
+<div class="settings w3-left-align">
 	<header class="w3-container w3-blue">
     <h4>Tracker</h4>
     </header>
     
 	<form class="w3-container w3-card-4" style="min-height:580px" method="post" action="">
     	<input type="hidden" name="id" value="2">
-    	<br>
-		<fieldset>
-			<legend><h4 style="padding:0px 4px;">Site coordinates</h4></legend>
+    	<fieldset class="w3-margin-top">
+			<legend><h4>Site coordinates</h4></legend>
 			<div><input class="w3-input" type="number" id="lat" name="lat" min="-90.0" max="90.0" value="0.0" step="0.01" required><label class="w3-label w3-validate">Latitude</label></div>
 			<div><input class="w3-input" type="number" id="lon" name="lon" min="-180.0" max="180.0" value="0.0" step="0.01" required><label class="w3-label w3-validate">Longitude</label></div>
             <div><input class="w3-input" type="number" id="alt" name="alt" min="0" value="0" step="0.01" required><label class="w3-label w3-validate">Altitude (m)</label></div>
 		</fieldset>
-		<br>
-		<fieldset>
-			<legend><h4 style="padding:0px 4px;">Satellite</h4></legend>
+		<fieldset class="w3-margin-top">
+			<legend><h4>Satellite</h4></legend>
     		<div><input class="w3-input" type="number" id="sat" name="sat" min="0" value="0" required><label class="w3-label w3-validate">NORAD Catalog Number</label></div>
 		</fieldset>
-
-		<br>
+        <br>
 		<button type="summit" class="w3-btn w3-blue w3-center">Save</button>
-		<br><br>
 	</form>
 </div>
 
-<div class="w3-third" style="width:450px">
+<div class="settings w3-left-align">
 	<header class="w3-container w3-blue">
     <h4>Other</h4>
     </header>
     
 	<form class="w3-container w3-card-4" style="min-height:580px" method="post" action="">
     	<input type="hidden" name="id" value="3">
-        <br>
-		<fieldset>
-			<legend><h4 style="padding:0px 4px;">Color</h4></legend>
+        <fieldset class="w3-margin-top">
+			<legend><h4>Color</h4></legend>
             <table class="w3-table w3-bordered w3-centered">
             <thead>
             <tr>
@@ -100,9 +91,8 @@
             </tbody>
 			</table>
 		</fieldset>
-        <br>
-        <fieldset>
-			<legend><h4 style="padding:0px 4px;">Time</h4></legend>
+        <fieldset class="w3-margin-top">
+			<legend><h4>Time</h4></legend>
             <label><input type="checkbox" id="ds" name="ds"> Daylight saving time</label>
             <select  id="tz" name="tz" class="w3-input">
                 <option value="-12">UTC-12:00</option>
@@ -137,10 +127,9 @@
             <div><input class="w3-input" type="text" id="ts" name="ts" maxlength="127" required><label class="w3-label w3-validate">NTP server</label></div>
             
 		</fieldset>
-
 		<br>
 		<button type="summit" class="w3-btn w3-blue w3-center">Save</button>
-		<br><br>
+
 	</form>
 </div>
 
