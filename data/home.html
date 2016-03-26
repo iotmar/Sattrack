@@ -5,6 +5,7 @@
 <title>Satellite tracker</title>
 <link href="w3.css" rel="stylesheet" type="text/css">
 <script src="/microajax.js"></script>
+<script src="/sunlight.js"></script>
 </head>
 
 <body>
@@ -23,7 +24,15 @@
 <tr><th>Azimuth:</th><td id="az">-</td><th>Elevation:</th><td id="el">-</td><th>Distance:</th><td id="dist">-</td></tr>
 <tr><th>Visible:</th><td id="vis">-</td><th>Time:</th><td id="time">-</td><th>Connection:</th><td id="con">Pending</td></tr>
 </table>
+<div class="w3-padding-large">
+  <canvas id="map" style="display:block;margin:0 auto;" class="w3-card-4" width="0" height="0">
+    Your browser does not support HTML5 canvas.
+  </canvas>
+  <center>&copy Nasa</center>
 </div>
+
+</div>
+
 <hr>
 
 <div class="w3-container w3-center" >
@@ -65,6 +74,7 @@
 
 </body>
 <script>
+var time=new Date();
 window.onload=function (){
 	var a=new ArrayBuffer(4);
 	var b=new Uint8Array(a);
@@ -92,12 +102,12 @@ window.onload=function (){
 		var vis;
 		switch(dv.getInt16(48,en)){case 0:vis="Eclipsed";break;case -2:vis="Not visible";break;case -1:vis="Daylight";break;default:vis="Visible";}
 		inner('vis',vis);
-		var dt=new Date(dv.getFloat64(50,en));
-		dt=dt.toTimeString().split(' ');
+		time=new Date(dv.getFloat64(50,en));
+		var dt=time.toTimeString().split(' ');
 		inner('time',dt[0]);
 	}
 	sock.onclose=function(){inner('con','Closed');}
-	sock.onopen=function(){inner('con','Running');}
+	sock.onopen=function(){inner('con','Running');initmap();}
 	sock.onerror=function(){inner('con','Error');sock.close();}
 }
 

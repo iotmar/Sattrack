@@ -8,7 +8,7 @@
 
 
 const char* host = "Sattrack";
-const char* ap_password = "12345";
+const char* ap_password = "123456789";
 
 
 AsyncWebServer server(80);
