@@ -91,7 +91,7 @@ window.onload=function (){
 		sock.send(1);
 		var da=e.data;
 		var dv=new DataView(da);
-		if (dv.byteLength == 1){setTimeout(function e(){setValues("/data");},Math.random()*5000);return;}
+		if (dv.byteLength == 1){setTimeout(function e(){setValues("/data");},Math.random()*2000);return;}
 		function get(e,n,l){inner(e,dv.getFloat64(n,en).toFixed(2).toString()+l);}
 		get('lon',0,'°');
 		get('lat',8,'°');

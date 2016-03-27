@@ -43,6 +43,11 @@ AsyncWebServerRequest *PredictRequest = NULL;
   }
 #endif
 
+enum state_mode {
+    RECALC,
+    RESTART,
+    IDLE
+}state;
 
 /////Flags//////
 

@@ -126,7 +126,8 @@ void setup() {
     ticker.attach(1,Second_Tick);
     framerate = 0;
   #endif
- 
+
+  state=IDLE;
 }
 
 //////////////////////////////////////
@@ -183,9 +184,6 @@ void loop() {
                 Serial.println("Can't get data");
                 Serial.println();
               #endif
-              LedStrip.SetAnimColor(0x0,0x0,0x0,0x9f,0x0,0x0);
-              LedStrip.AnimStart(ANIM_WAIT);
-              dataError = true;
               updatejdtime = jd + 0.000694;   // retry update in 1 min
           }else{
               dataError = false;
@@ -232,8 +230,34 @@ void loop() {
       PredictRequest = NULL;
   }
   
-  //server.handleClient();
-  
+  ///statemachine///
+
+  switch(state){
+       case RECALC:
+          LedStrip.SetAnimColor(0xff,0x66,0x0);
+          LedStrip.AnimStart(ANIM_WAIT);
+          sat.site(config->lat,config->lon,config->alt);  //set new coordinates
+          if(!getTle(config->satnum, true)){              //get new tle and recalculate overpasses
+              LedStrip.SetAnimColor(0x9f,0x0,0x0);
+              LedStrip.AnimStart(ANIM_FLASH);
+              dataError = true;
+              updatejdtime = getJulianTime() + 0.000694;   // retry update in 1 min
+          }else{
+              LedStrip.AnimStop();
+              dataError = false;
+          }
+          state=IDLE;
+          break;
+      
+      case RESTART:
+          closeAllConnections();
+          delay(5000);
+          ESP.restart();
+          state=IDLE;
+          break;
+  }
+
+  ///OTA and debug////
 
   #ifdef DEBUG_frame
     framerate +=1;

@@ -122,7 +122,7 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
       for ( uint8_t i = 1; i < params; i++ ) {
 
           if (part == 1){
-                   if (request->getParam(i)->name() == "SSID") {strncpy(config->ssid,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ssid));restart = true;}
+                   if (request->getParam(i)->name() == "SSID") {strncpy(config->ssid,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ssid));state = RESTART;}
               else if (request->getParam(i)->name() == "PSK")  {strncpy(config->password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::password));}
               else if (request->getParam(i)->name() == "ip_0") {if (checkRange(request->getParam(i)->value()))   config->IP[0] =  (uint8_t)request->getParam(i)->value().toInt();}
               else if (request->getParam(i)->name() == "ip_1") {if (checkRange(request->getParam(i)->value()))   config->IP[1] =  (uint8_t)request->getParam(i)->value().toInt();}
@@ -140,7 +140,7 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
           }
 
           if (part == 2){
-                   if (request->getParam(i)->name() == "lon") {config->lon = atof(request->getParam(i)->value().c_str());recalc = true;}
+                   if (request->getParam(i)->name() == "lon") {config->lon = atof(request->getParam(i)->value().c_str());state = RECALC;}
               else if (request->getParam(i)->name() == "lat") {config->lat = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "alt") {config->alt = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "sat") {config->satnum = atoi(request->getParam(i)->value().c_str());}
@@ -162,20 +162,6 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
       EEPROM.getDataPtr();
       EEPROM.commit();
 
-      if(recalc){
-          LedStrip.SetAnimColor(0xff,0x66,0x0);
-          LedStrip.AnimStart(ANIM_WAIT);
-          
-          sat.site(config->lat,config->lon,config->alt);  //set new coordinates
-          getTle(config->satnum, true);                   //get new tle and recalculate overpasses
-
-          LedStrip.AnimStop();
-      }
-      
-      if(restart){
-          closeAllConnections();
-          ESP.restart();
-      }
       return true;
       
     }else{
