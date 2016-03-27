@@ -1,3 +1,36 @@
+
+var points = 80;
+
+function initFootcalc(){
+	with(Math){
+	var lon=parseFloat(document.getElementById("lon").innerHTML)*Math.PI/180.0;
+	var lat=parseFloat(document.getElementById("lat").innerHTML)*Math.PI/180.0;
+	var alt=parseFloat(document.getElementById("alt").innerHTML);
+	var off=0.0*PI/180.0;
+	var r=(PI/2)-acos(cos(off)/((alt+6367.4445)/6367.4445))-off;
+	p1c=sin(lon)*cos(r);p1s=sin(lat)*cos(lon)*cos(r);p1=cos(lat)*cos(lon)*sin(r);
+	p2c=-cos(lon)*cos(r);p2s=sin(lat)*sin(lon)*cos(r);p2=cos(lat)*sin(lon)*sin(r);
+	p3=sin(lat)*sin(r);p3s=-cos(lat)*cos(r);
+	}
+}
+function footcalc(t){
+	with(Math){
+	var x=p1c*cos(t)+p1s*sin(t)+p1;
+	var y=p2c*cos(t)+p2s*sin(t)+p2;
+	var z=p3s*sin(t)+p3;
+	return [atan2(y,x)*180.0/PI, atan2(z,sqrt(x*x+y*y))*180.0/PI];
+	}
+}
+function footprint(ctx){
+	initFootcalc();
+	ctx.strokeStyle = 'white';
+	var step=2*Math.PI/points;
+	for (i=0;i<points;i++){
+		pos=footcalc(step*i);
+		if (pos[0]>0){pos[0] -= 360.0;}
+		ctx.strokeRect(pixelX(-pos[0]),pixelY(pos[1]),1,1);
+	};
+}
 // (C) 2011 g/christensen (gchristnsn@gmail.com)
 
 // Map dimensions
@@ -51,13 +84,13 @@ function drawCircle(ctx, cx, cy, r, fill)
 } 
 
 function initmap()
-{
+{	
 	adjustParameters();
 
 	mapImage = new Image(); 
-	mapImage.onload = function () { drawDayNightMap(mapImage);setInterval(function(){drawDayNightMap(mapImage);},1000); };
+	mapImage.onload = function () { drawDayNightMap(mapImage);setInterval(function(){drawDayNightMap(mapImage);},1000);};
 	mapImage.src = "/map.jpg";
-	
+
 }
 
 
@@ -70,7 +103,6 @@ function drawDayNightMap(mapImage)
 	var ctx = map.getContext("2d");	
 
 	ctx.drawImage(mapImage, 0, 0);
-
 	performCalculations(time);
 
 	var northSun = DECsun >= 0;
@@ -98,11 +130,13 @@ function drawDayNightMap(mapImage)
 				ctx.fillRect(x, rectTop, 1, rectHeight);                                             				
 				break;
 			}    
-		}                          
+		}   
+	                      
 	var lon = - parseFloat(document.getElementById("lon").innerHTML);
 	if (lon<0){lon += 360.0;}
 	var lat = parseFloat(document.getElementById("lat").innerHTML);
 	drawCircle(ctx, pixelX(lon), pixelY(lat), 5, "#FF0000");
+	footprint(ctx);
 }		
 
 // Source: Henning Umland, http://www.celnav.de/longterm.htm
