@@ -6,8 +6,8 @@ function initFootcalc(){
 	var lon=parseFloat(document.getElementById("lon").innerHTML)*Math.PI/180.0;
 	var lat=parseFloat(document.getElementById("lat").innerHTML)*Math.PI/180.0;
 	var alt=parseFloat(document.getElementById("alt").innerHTML);
-	var off=0.0*PI/180.0;
-	var r=(PI/2)-acos(cos(off)/((alt+6367.4445)/6367.4445))-off;
+	var off=parseFloat(document.getElementById("off").innerHTML)*PI/180.0;
+	var r=(PI/2)-acos(cos(off)/((alt+6367.4445)/6367.4445))+off;
 	p1c=sin(lon)*cos(r);p1s=sin(lat)*cos(lon)*cos(r);p1=cos(lat)*cos(lon)*sin(r);
 	p2c=-cos(lon)*cos(r);p2s=sin(lat)*sin(lon)*cos(r);p2=cos(lat)*sin(lon)*sin(r);
 	p3=sin(lat)*sin(r);p3s=-cos(lat)*cos(r);

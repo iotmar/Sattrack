@@ -7,10 +7,6 @@
 #define PIXELS 12
 
 
-const char* host = "Sattrack";
-const char* ap_password = "123456789";
-
-
 AsyncWebServer server(80);
 WebSocketsServer webSocket(81);
 Sgp4 sat;

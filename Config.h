@@ -3,7 +3,7 @@
 
 #include "Pixels.h"
 
-#define CONFIGVERSION 6
+#define CONFIGVERSION 7
 
 void closeAllConnections();
 void sendconfig(AsyncWebServerRequest *request);
@@ -27,6 +27,7 @@ struct ConfigStruct {
     double lon;
     double lat;
     double alt;
+    double offset;
   
     int8_t timezone;
     uint8_t version;
@@ -42,13 +43,18 @@ struct ConfigStruct {
     char ntpServerName[128];
     char password[64];
     char ssid[32]; 
+    char host[32];
+    char ap_password[32];
 };
 
 ConfigStruct* config;
 
 void setDefaultConfig(){
-    config->ssid[0] = '\0';
+  
+    strcpy(config->ssid,"SSID");
     config->password[0] = '\0';
+    strcpy(config->host,"Sattrack");
+    strcpy(config->ap_password,"123456789");
 
     strcpy(config->ntpServerName, "0.be.pool.ntp.org");
     config->daylight = true;
@@ -62,6 +68,7 @@ void setDefaultConfig(){
     config->lat = 0.0; 
     config->lon = 0.0;
     config->alt = 0.0;
+    config->offset = 0.0;
     config->satnum = 25544;   //ISS
 
     config->ColorDayL = RgbColor(0,255,0);  //green
@@ -124,6 +131,8 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
           if (part == 1){
                    if (request->getParam(i)->name() == "SSID") {strncpy(config->ssid,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ssid));state = RESTART;}
               else if (request->getParam(i)->name() == "PSK")  {strncpy(config->password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::password));}
+              else if (request->getParam(i)->name() == "HOST")  {strncpy(config->host,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::host));}
+              else if (request->getParam(i)->name() == "PASS")  {strncpy(config->ap_password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ap_password));}
               else if (request->getParam(i)->name() == "ip_0") {if (checkRange(request->getParam(i)->value()))   config->IP[0] =  (uint8_t)request->getParam(i)->value().toInt();}
               else if (request->getParam(i)->name() == "ip_1") {if (checkRange(request->getParam(i)->value()))   config->IP[1] =  (uint8_t)request->getParam(i)->value().toInt();}
               else if (request->getParam(i)->name() == "ip_2") {if (checkRange(request->getParam(i)->value()))   config->IP[2] =  (uint8_t)request->getParam(i)->value().toInt();}
@@ -143,6 +152,7 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
                    if (request->getParam(i)->name() == "lon") {config->lon = atof(request->getParam(i)->value().c_str());state = RECALC;}
               else if (request->getParam(i)->name() == "lat") {config->lat = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "alt") {config->alt = atof(request->getParam(i)->value().c_str());}
+              else if (request->getParam(i)->name() == "off") {config->offset = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "sat") {config->satnum = atoi(request->getParam(i)->value().c_str());}
           }
 

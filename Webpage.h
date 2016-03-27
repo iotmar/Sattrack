@@ -25,6 +25,7 @@ class Stringbuffer {
                                                 strncat(buff, timebuff, BUFFER_SIZE - strlen(buff) - 1);
                                                }
     void add(double i){String cast = String(i);strncat(buff, cast.c_str(), BUFFER_SIZE - strlen(buff) - 1);}
+    void add(double i,unsigned char prec){char buffer [11];dtostrf(i,10,prec,buffer);String cast = String(buffer);cast.trim();strncat(buff,cast.c_str(), BUFFER_SIZE - strlen(buff) - 1);}
     void addColor(RgbColor c){ String i="#";
                                i+=String(c.R>>4,HEX);i+=String(c.R & 0xf,HEX);
                                i+=String(c.G>>4,HEX);i+=String(c.G & 0xf,HEX);
@@ -98,7 +99,7 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
     int year,mon,day,hr,min;
     double sec;
     
-    Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23));
+    Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 15);
     
     if (!(predError || err)){
         buf.add("tab|pass|8|");
@@ -143,6 +144,7 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
     invjday(sat.satrec.jdsatepoch ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
     buf.add("\ndiv|epoch|");buf.add(day);buf.add("/");buf.add(mon);buf.add("/");buf.add(year);buf.add(" ");buf.addTime(hr,min,sec);
     buf.add("\ndiv|sat|");buf.add(sat.satName);
+    buf.add("\ndiv|off|");buf.add(config->offset);
     
     request->send ( 200, "text/plain", buf.getPointer());
 
@@ -176,16 +178,19 @@ void checkdata(AsyncWebServerRequest *request){
 void sendconfig(AsyncWebServerRequest *request){
 
     if ( WiFi.getMode() != WIFI_AP){
-      if ( !request->authenticate(host,ap_password)){
+      if ( !request->authenticate(config->host,config->ap_password)){
         request->requestAuthentication();
         return;
       }
     }
     
-    Stringbuffer buf(43 + 75 + 15*12 + 16*4 + 19*6 + 138 + 13 + 16*3 +  20);
+    Stringbuffer buf(43*3 + 75 + 15*12 + 23*2 + 16*3 + 19*6 + 138 + 13 + 16*3 +  20);
     
     buf.add("input|SSID|");buf.add(config->ssid);
+    buf.add("\ninput|HOST|");buf.add(config->host);
+    buf.add("\ninput|PASS|");buf.add(config->ap_password);
     buf.add("\ninput|PSK|");buf.add(config->password);
+
     buf.add("\ninput|ip_0|");buf.add(config->IP[0]);
     buf.add("\ninput|ip_1|");buf.add(config->IP[1]);
     buf.add("\ninput|ip_2|");buf.add(config->IP[2]);
@@ -199,10 +204,11 @@ void sendconfig(AsyncWebServerRequest *request){
     buf.add("\ninput|gw_2|");buf.add(config->Gateway[2]);
     buf.add("\ninput|gw_3|");buf.add(config->Gateway[3]);
 
-    buf.add("\ninput|lat|");buf.add(config->lat);
-    buf.add("\ninput|lon|");buf.add(config->lon);
+    buf.add("\ninput|lat|");buf.add(config->lat,4);
+    buf.add("\ninput|lon|");buf.add(config->lon,4);
     buf.add("\ninput|alt|");buf.add(config->alt);
     buf.add("\ninput|sat|");buf.add(config->satnum);
+    buf.add("\ninput|off|");buf.add(config->offset);
 
     buf.add("\ninput|VisL|");buf.addColor(config->ColorVisL);
     buf.add("\ninput|VisH|");buf.addColor(config->ColorVisH);
@@ -248,7 +254,7 @@ void initServer(){
     server.on("/settings.html", [](AsyncWebServerRequest *request){
 
         if ( WiFi.getMode() != WIFI_AP){
-          if ( !request->authenticate(host,ap_password)){
+          if ( !request->authenticate(config->host,config->ap_password)){
             request->requestAuthentication();
             return;
           }
@@ -338,7 +344,7 @@ void initOTA(){
       });
     #endif
     
-    ArduinoOTA.setHostname(host);
+    ArduinoOTA.setHostname(config->host);
     ArduinoOTA.begin();
 }
 

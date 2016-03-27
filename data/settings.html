@@ -23,12 +23,17 @@
     <h4>Network</h4>
     </header>
     
-	<form class="w3-container w3-card-4" style="min-height:580px" method="post" action="">
+	<form class="w3-container w3-card-4" style="min-height:620px" method="post" action="">
     	<input type="hidden" name="id" value="1">
 		<fieldset class="w3-margin-top">
 			<legend><h4>Wifi</h4></legend>
 			<div><input class="w3-input" type="text" id="SSID" name="SSID" maxlength="31" required><label class="w3-label w3-validate">SSID</label></div>
 			<div><input class="w3-input" type="password" id="PSK" name="PSK" maxlength="63" required><label class="w3-label w3-validate">Password</label></div>
+		</fieldset>
+        <fieldset class="w3-margin-top">
+			<legend><h4>Device</h4></legend>
+			<div><input class="w3-input" type="text" id="HOST" name="HOST" maxlength="31" required><label class="w3-label w3-validate">Device name</label></div>
+			<div><input class="w3-input" type="password" id="PASS" name="PASS" maxlength="31" required><label class="w3-label w3-validate">Password</label></div>
 		</fieldset>
 		<fieldset class="w3-margin-top">
 			<legend><h4>Advanced</h4></legend>
@@ -50,17 +55,18 @@
     <h4>Tracker</h4>
     </header>
     
-	<form class="w3-container w3-card-4" style="min-height:580px" method="post" action="">
+	<form class="w3-container w3-card-4" style="min-height:620px" method="post" action="">
     	<input type="hidden" name="id" value="2">
     	<fieldset class="w3-margin-top">
 			<legend><h4>Site coordinates</h4></legend>
-			<div><input class="w3-input" type="number" id="lat" name="lat" min="-90.0" max="90.0" value="0.0" step="0.01" required><label class="w3-label w3-validate">Latitude</label></div>
-			<div><input class="w3-input" type="number" id="lon" name="lon" min="-180.0" max="180.0" value="0.0" step="0.01" required><label class="w3-label w3-validate">Longitude</label></div>
-            <div><input class="w3-input" type="number" id="alt" name="alt" min="0" value="0" step="0.01" required><label class="w3-label w3-validate">Altitude (m)</label></div>
+			<div><input class="w3-input" type="number" id="lat" name="lat" min="-90.0" max="90.0" value="0.0" step="0.0001" required><label class="w3-label w3-validate">Latitude [°]</label></div>
+			<div><input class="w3-input" type="number" id="lon" name="lon" min="-180.0" max="180.0" value="0.0" step="0.0001" required><label class="w3-label w3-validate">Longitude [°]</label></div>
+            <div><input class="w3-input" type="number" id="alt" name="alt" min="0" value="0" step="0.01" required><label class="w3-label w3-validate">Altitude [m]</label></div>
 		</fieldset>
 		<fieldset class="w3-margin-top">
 			<legend><h4>Satellite</h4></legend>
-    		<div><input class="w3-input" type="number" id="sat" name="sat" min="0" value="0" required><label class="w3-label w3-validate">NORAD Catalog Number</label></div>
+            <div><input class="w3-input" type="number" id="off" name="off" min="0.0" max="89.0" value="0.0" step="0.01" required><label class="w3-label w3-validate">Elevation offset [°]</label></div>
+    		<div><input class="w3-input" type="number" id="sat" name="sat" min="0" value="0" required><label class="w3-label w3-validate">NORAD catalog number</label></div>
 		</fieldset>
         <br>
 		<button type="summit" class="w3-btn w3-blue w3-center">Save</button>
@@ -72,7 +78,7 @@
     <h4>Other</h4>
     </header>
     
-	<form class="w3-container w3-card-4" style="min-height:580px" method="post" action="">
+	<form class="w3-container w3-card-4" style="min-height:620px" method="post" action="">
     	<input type="hidden" name="id" value="3">
         <fieldset class="w3-margin-top">
 			<legend><h4>Color</h4></legend>
@@ -80,7 +86,7 @@
             <thead>
             <tr>
               <th>Elevation</th>
-              <th>0°</th>
+              <th>Offset</th>
               <th>90°</th>
             </tr>
             </thead>

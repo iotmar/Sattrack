@@ -86,7 +86,7 @@ void Animo::Animation(){
           bus->SetPixelColor(frame, fcolor);
           frame = (frame+1)%PIXELS;
           bus->SetPixelColor(frame, fcolor);
-          bus->Show();
+          if(bus->CanShow()){bus->Show();}
       
           break;
 
@@ -98,7 +98,7 @@ void Animo::Animation(){
               frame = 1;
               bus->ClearTo(fcolor);
           }
-          bus->Show();
+          if(bus->CanShow()){bus->Show();}
           break;
    }  
 }

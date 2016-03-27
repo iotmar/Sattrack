@@ -67,7 +67,7 @@ void setup() {
   ///Start AP on timeout
   if (timeout > 15){
       WiFi.mode(WIFI_AP);
-      WiFi.softAP( host , ap_password);
+      WiFi.softAP( config->host , config->ap_password);
       LedStrip.SetAnimColor(0,0,0,0x0,0x0,0x9f);
       LedStrip.AnimStart(ANIM_WAIT);
       dataError = true;
@@ -87,9 +87,9 @@ void setup() {
 
   //Start MDNS
   #ifndef USE_OTA
-  if (MDNS.begin(host, WiFi.localIP())){
+  if (MDNS.begin(config->host, WiFi.localIP())){
     #ifdef DEBUG
-      Serial.printf("mDNS responder started for %s.local\n", host);
+      Serial.printf("mDNS responder started for %s.local\n", config->host);
       Serial.println();
     #endif
   }
@@ -142,7 +142,7 @@ void loop() {
     //webSocket.loop();
     sat.findsat(jd);   //find satellite position on system time
   
-    if ( sat.satEl > 0.0 ){   ///aboven horizon => display
+    if ( sat.satEl > config->offset ){   ///aboven horizon => display
         if (LedStrip.CanShow()){
           ColorCalc(jd,sat.satEl,sat.satVis);
         }
@@ -289,10 +289,10 @@ void ColorCalc(double jd,double satEl,int16_t satVis){
   
   RgbColor Color;
   if (satVis == -1){    ///daylight
-      Color = RgbColor::LinearBlend(config->ColorDayL, config->ColorDayH, satEl/90.0);
+      Color = RgbColor::LinearBlend(config->ColorDayL, config->ColorDayH, (satEl-config->offset)/(90.0-config->offset));
   }else{   //dark
-      RgbColor visible = RgbColor::LinearBlend(config->ColorVisL, config->ColorVisH, satEl/90.0);
-      RgbColor eclipsed = RgbColor::LinearBlend(config->ColorEclL, config->ColorEclH, satEl/90.0);
+      RgbColor visible = RgbColor::LinearBlend(config->ColorVisL, config->ColorVisH, (satEl-config->offset)/(90.0-config->offset));
+      RgbColor eclipsed = RgbColor::LinearBlend(config->ColorEclL, config->ColorEclH, (satEl-config->offset)/(90.0-config->offset));
       Color = RgbColor::LinearBlend(eclipsed, visible, satVis/1000.0);     
   }
 
