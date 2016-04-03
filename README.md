@@ -19,10 +19,10 @@ Sattrack is a small device that sits on your desk, and warn you when the Iss is 
 - Change CPU frequency to 160 MHz and use minimum 64k SPIFFS.
 - Compile and upload the code to your ESP.
 - Upload the data to SPIFFS (see [here](https://github.com/esp8266/Arduino/blob/master/doc/filesystem.md) for more information).
-- Wait until it opens an AP (indicated by a blue spinning wheel), and connect to "Sattrack" with password "12345". (This can be changed in "Globals.h".)
+- Wait until it opens an AP (indicated by a blue spinning wheel), and connect to "Sattrack" with password "123456789". (This can be changed in "Globals.h".)
 - Go to [sattrack.local/settings.html](http://sattrack.local/settings.html) and change network settings. Save and restart.
 - Connect to your own AP and go back to the setting page. It will ask you to login.
-- Use again "Sattrack" with password "12345", and change your site coordinates and other settings.
+- Use again "Sattrack" with password "123456789", and change your site coordinates and other settings.
 - Wait until the ISS is overhead.
 - Wave at the astronauts!
 
