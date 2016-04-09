@@ -155,13 +155,26 @@ bool getTle(int ide, bool forceupdate){
       Serial.println(longstr2);
       Serial.flush();   //wait until data is send, it cause a wdt reset because sat.init changes the char[]
     #endif
+
+    if ( !twolineChecksum(longstr1) || !twolineChecksum(longstr2)){
+        #ifdef DEBUG
+          Serial.println("Checksum failed");
+        #endif
+        return false;
+    }
+    yield();
+    
     bool satupdate = sat.init(naam,longstr1,longstr2);
-    if( satupdate || forceupdate ){
+    #ifdef DEBUG
+      Serial.println("Program has been here");
+    #endif
+    yield();
+    
+    if( satupdate || forceupdate){     
       predError = !predictPasses();
       uint8_t buf[]="n";webSocket.broadcastBIN(buf,1); ///update websites
     }
     
-    client.stop();
     return true;
   }
   return false;
