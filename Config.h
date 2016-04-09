@@ -129,10 +129,10 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
       for ( uint8_t i = 1; i < params; i++ ) {
 
           if (part == 1){
-                   if (request->getParam(i)->name() == "SSID") {strncpy(config->ssid,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ssid));state = RESTART;}
-              else if (request->getParam(i)->name() == "PSK")  {strncpy(config->password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::password));}
-              else if (request->getParam(i)->name() == "HOST")  {strncpy(config->host,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::host));}
-              else if (request->getParam(i)->name() == "PASS")  {strncpy(config->ap_password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ap_password));}
+                   if (request->getParam(i)->name() == "SSID") {strlcpy(config->ssid,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ssid));state = RESTART;}
+              else if (request->getParam(i)->name() == "PSK")  {strlcpy(config->password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::password));}
+              else if (request->getParam(i)->name() == "HOST")  {strlcpy(config->host,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::host));}
+              else if (request->getParam(i)->name() == "PASS")  {strlcpy(config->ap_password,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ap_password));}
               else if (request->getParam(i)->name() == "ip_0") {if (checkRange(request->getParam(i)->value()))   config->IP[0] =  (uint8_t)request->getParam(i)->value().toInt();}
               else if (request->getParam(i)->name() == "ip_1") {if (checkRange(request->getParam(i)->value()))   config->IP[1] =  (uint8_t)request->getParam(i)->value().toInt();}
               else if (request->getParam(i)->name() == "ip_2") {if (checkRange(request->getParam(i)->value()))   config->IP[2] =  (uint8_t)request->getParam(i)->value().toInt();}
@@ -164,7 +164,7 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
               else if (request->getParam(i)->name() == "EclL") {config->ColorEclL = HexColorToRgb(request->getParam(i)->value());}
               else if (request->getParam(i)->name() == "EclH") {config->ColorEclH = HexColorToRgb(request->getParam(i)->value());}
               else if (request->getParam(i)->name() == "ds") {config->daylight = true;}
-              else if (request->getParam(i)->name() == "ts") {strncpy(config->ntpServerName,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ntpServerName));}
+              else if (request->getParam(i)->name() == "ts") {strlcpy(config->ntpServerName,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ntpServerName));}
               else if (request->getParam(i)->name() == "tz") {config->timezone =  (int8_t)request->getParam(i)->value().toInt();}
           }
       }
