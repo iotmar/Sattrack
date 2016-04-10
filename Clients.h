@@ -173,10 +173,6 @@ bool getTle(int ide, bool forceupdate){
     delete[] naam;
     delete[] longstr1;
     delete[] longstr2;
-    #ifdef DEBUG
-      Serial.println("Program has been here");
-    #endif
-    yield();
     
     if( satupdate || forceupdate){     
       predError = !predictPasses();

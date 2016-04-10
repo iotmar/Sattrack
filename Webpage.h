@@ -184,7 +184,7 @@ void sendconfig(AsyncWebServerRequest *request){
       }
     }
     
-    Stringbuffer buf(43*3 + 75 + 15*12 + 23*2 + 16*3 + 19*6 + 138 + 13 + 16*3 +  20);
+    Stringbuffer buf(43*3 + 75 + 15*12 + 23*2 + 16*4 + 19*6 + 138 + 13 + 16*3 +  20);
     
     buf.add("input|SSID|");buf.add(config->ssid);
     buf.add("\ninput|HOST|");buf.add(config->host);
@@ -209,6 +209,7 @@ void sendconfig(AsyncWebServerRequest *request){
     buf.add("\ninput|alt|");buf.add(config->alt);
     buf.add("\ninput|sat|");buf.add(config->satnum);
     buf.add("\ninput|off|");buf.add(config->offset);
+    buf.add("\ninput|sun|");buf.add(config->sunoffset);
 
     buf.add("\ninput|VisL|");buf.addColor(config->ColorVisL);
     buf.add("\ninput|VisH|");buf.addColor(config->ColorVisH);

@@ -3,7 +3,7 @@
 
 #include "Pixels.h"
 
-#define CONFIGVERSION 7
+#define CONFIGVERSION 8
 
 void closeAllConnections();
 void sendconfig(AsyncWebServerRequest *request);
@@ -28,6 +28,7 @@ struct ConfigStruct {
     double lat;
     double alt;
     double offset;
+    double sunoffset;
   
     int8_t timezone;
     uint8_t version;
@@ -69,6 +70,7 @@ void setDefaultConfig(){
     config->lon = 0.0;
     config->alt = 0.0;
     config->offset = 0.0;
+    config->sunoffset = -6.0;
     config->satnum = 25544;   //ISS
 
     config->ColorDayL = RgbColor(0,255,0);  //green
@@ -153,6 +155,7 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
               else if (request->getParam(i)->name() == "lat") {config->lat = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "alt") {config->alt = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "off") {config->offset = atof(request->getParam(i)->value().c_str());}
+              else if (request->getParam(i)->name() == "sun") {config->sunoffset = atof(request->getParam(i)->value().c_str());}
               else if (request->getParam(i)->name() == "sat") {config->satnum = atoi(request->getParam(i)->value().c_str());}
           }
 

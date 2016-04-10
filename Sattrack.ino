@@ -84,6 +84,7 @@ void setup() {
 
   ///Set site coordinates
   sat.site(config->lat,config->lon,config->alt);
+  sat.setsunrise(config->sunoffset);
 
   //Start MDNS
   #ifndef USE_OTA
@@ -237,6 +238,7 @@ void loop() {
           LedStrip.SetAnimColor(0xff,0x66,0x0);
           LedStrip.AnimStart(ANIM_WAIT);
           sat.site(config->lat,config->lon,config->alt);  //set new coordinates
+          sat.setsunrise(config->sunoffset);
           if(!getTle(config->satnum, true)){              //get new tle and recalculate overpasses
               LedStrip.SetAnimColor(0x9f,0x0,0x0);
               LedStrip.AnimStart(ANIM_FLASH);
