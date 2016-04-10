@@ -18,19 +18,22 @@
 </div>
 
 <div class="w3-container w3-left-align" >
-<h1 class="w3-center" id="sat">Satellite tracker</h1>
-<table style="max-width:650px;table-layout:fixed;font-weight:normal;" align="center">
-<tr><th>Latitude:</th><td id="lat">-</td><th>Longitude:</th><td id="lon">-</td><th>Altitude:</th><td id="alt">-</td></tr>
-<tr><th>Azimuth:</th><td id="az">-</td><th>Elevation:</th><td id="el">-</td><th>Distance:</th><td id="dist">-</td></tr>
-<tr><th>Visible:</th><td id="vis">-</td><th>Time:</th><td id="time">-</td><th>Connection:</th><td id="con">Pending</td></tr>
-</table>
-<div class="w3-padding-large">
-  <canvas id="map" style="display:block;margin:0 auto;" class="w3-card-4" width="0" height="0">
-    Your browser does not support HTML5 canvas.
-  </canvas>
-  <center>&copy Nasa</center>
-</div>
-
+    <h1 class="w3-center" id="sat">Satellite tracker</h1>
+    <table style="max-width:650px;table-layout:fixed;font-weight:normal;" align="center">
+    <tr><th>Latitude:</th><td id="lat">-</td><th>Longitude:</th><td id="lon">-</td><th>Altitude:</th><td id="alt">-</td></tr>
+    <tr><th>Azimuth:</th><td id="az">-</td><th>Elevation:</th><td id="el">-</td><th>Distance:</th><td id="dist">-</td></tr>
+    <tr><th>Visible:</th><td id="vis">-</td><th>Time:</th><td id="time">-</td><th>Connection:</th><td id="con">Pending</td></tr>
+    </table>
+    <div id="hid" class="w3-padding-large" style="display:none">
+        <div class="w3-card-4" style="margin: 0 auto;position: relative;width:750px; height:375px">
+          <canvas id="map" style="display:block;position: absolute;left:0;top:0;z-index:0;">
+          </canvas>
+          <canvas id="dot" style="display:block;position: absolute;left:0;top:0;z-index:1;">
+            Your browser does not support HTML5 canvas.
+          </canvas>
+        </div>
+      <center>&copy Nasa</center>
+    </div>
 </div>
 
 <hr>

@@ -88,18 +88,38 @@ function initmap()
 	adjustParameters();
 
 	mapImage = new Image(); 
-	mapImage.onload = function () { drawDayNightMap(mapImage);setInterval(function(){drawDayNightMap(mapImage);},1000);};
+	mapImage.onload = function () {
+		document.getElementById("hid").style.display = "initial";
+		canvas = document.getElementById("dot");	
+		canvas.width = mapWidth;
+		canvas.height = mapHeight;
+		map = document.getElementById("map");
+		map.width = mapWidth;
+		map.height = mapHeight;
+		drawDayNightMap(mapImage);
+		drawFootprint();
+		setInterval(function(){drawDayNightMap(mapImage);},60000);
+		setInterval(drawFootprint,1000);
+		};
 	mapImage.src = "/map.jpg";
-
 }
 
+function drawFootprint(){
+
+	var ctx = canvas.getContext("2d");
+	
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+	var lon = - parseFloat(document.getElementById("lon").innerHTML);
+	if (lon<0){lon += 360.0;}
+	var lat = parseFloat(document.getElementById("lat").innerHTML);
+	ctx.strokeStyle = 'black';
+	drawCircle(ctx, pixelX(lon), pixelY(lat), 5, "#FF0000");
+	footprint(ctx);
+}
 
 function drawDayNightMap(mapImage)
 {
-    var map = document.getElementById("map");
-
-	map.width = mapWidth;
-	map.height = mapHeight;
 	var ctx = map.getContext("2d");	
 
 	ctx.drawImage(mapImage, 0, 0);
@@ -131,12 +151,7 @@ function drawDayNightMap(mapImage)
 				break;
 			}    
 		}   
-	                      
-	var lon = - parseFloat(document.getElementById("lon").innerHTML);
-	if (lon<0){lon += 360.0;}
-	var lat = parseFloat(document.getElementById("lat").innerHTML);
-	drawCircle(ctx, pixelX(lon), pixelY(lat), 5, "#FF0000");
-	footprint(ctx);
+	                    
 }		
 
 // Source: Henning Umland, http://www.celnav.de/longterm.htm
