@@ -61,7 +61,7 @@ void setDefaultConfig(){
     config->daylight = true;
     config->timezone = 1;
     
-    config->dhcp = false;
+    config->dhcp = true;
     config->IP[0]=192;config->IP[1]=168;config->IP[2]=1;config->IP[3]=100;
     config->Netmask[0]=255;config->Netmask[1]=255;config->Netmask[2]=255;config->Netmask[3]=0;
     config->Gateway[0]=192;config->Gateway[1]=168;config->Gateway[2]=1;config->Gateway[3]=1;
