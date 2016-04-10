@@ -247,10 +247,14 @@ void initServer(){
     server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/favicon.ico","image/ico");});
     server.on("/map.jpg", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/map.jpg","image/jpg");});
     server.on("/microajax.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/microajax.js","text/javascript");});
-    server.on("/sunlight.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/sunlight.js","text/javascript");});
-    server.on("/calculations.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/calculations.js","text/javascript");});  
+    server.on("/sunlight.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/sunlight.js","text/javascript");});  
     server.on("/config", HTTP_ANY, sendconfig);
     server.on("/data", HTTP_ANY, checkdata);
+    server.on("/site.appcache", HTTP_GET,[](AsyncWebServerRequest *request)
+        { AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/site.appcache","text/cache-manifest");
+          response->addHeader("Cache-Control","max-age=86400");
+          request->send(response);
+        });
  
     server.on("/settings.html", [](AsyncWebServerRequest *request){
 
