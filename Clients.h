@@ -122,16 +122,16 @@ bool getTle(int ide, bool forceupdate){
     }
     if (!succes){return false;}
     
-    char longstr1[80];
-    char longstr2[80];
-    char naam[25];
+    char* longstr1 = new char[80];
+    char* longstr2 = new char[80];
+    char* naam = new char[25];
 
     line = client.readStringUntil('\n');
-    strlcpy (naam, line.c_str(),sizeof(naam));
+    strlcpy (naam, line.c_str(),25);
     line = client.readStringUntil('\n');
-    strlcpy (longstr1, line.c_str(),sizeof(longstr1));
+    strlcpy (longstr1, line.c_str(),80);
     line = client.readStringUntil('\n');
-    strlcpy (longstr2, line.c_str(),sizeof(longstr2));
+    strlcpy (longstr2, line.c_str(),80);
     
     while(client.available()){
       client.flush();
@@ -147,6 +147,9 @@ bool getTle(int ide, bool forceupdate){
         Serial.println("\r\nnot a correct api-response");
       #endif
       client.stop();
+      delete[] naam;
+      delete[] longstr1;
+      delete[] longstr2;
       return false;
     }
     #ifdef DEBUG
@@ -160,11 +163,16 @@ bool getTle(int ide, bool forceupdate){
         #ifdef DEBUG
           Serial.println("Checksum failed");
         #endif
+        delete[] naam;
+        delete[] longstr1;
+        delete[] longstr2;
         return false;
     }
-    yield();
     
     bool satupdate = sat.init(naam,longstr1,longstr2);
+    delete[] naam;
+    delete[] longstr1;
+    delete[] longstr2;
     #ifdef DEBUG
       Serial.println("Program has been here");
     #endif
