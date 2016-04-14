@@ -50,6 +50,7 @@ struct ConfigStruct {
 
 ConfigStruct* config;
 
+
 void setDefaultConfig(){
   
     strcpy(config->ssid,"SSID");
@@ -82,6 +83,7 @@ void setDefaultConfig(){
 
     config->version = CONFIGVERSION;
 }
+
 
 void initConfig(){
 

@@ -175,6 +175,8 @@ void checkdata(AsyncWebServerRequest *request){
     }
 }
 
+///Send config settings///
+
 void sendconfig(AsyncWebServerRequest *request){
 
     if ( WiFi.getMode() != WIFI_AP){

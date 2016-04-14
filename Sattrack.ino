@@ -4,7 +4,6 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-//#include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <Sgp4.h>
@@ -140,7 +139,7 @@ void loop() {
   double jd = getJulianTime();
   
   if(!dataError){
-    //webSocket.loop();
+
     sat.findsat(jd);   //find satellite position on system time
   
     if ( sat.satEl > config->offset ){   ///aboven horizon => display
@@ -155,7 +154,7 @@ void loop() {
         
         if (passPredictions[0].jdstop <= jd && !predError){  //pred next past
              predError = !updatePasses();
-             uint8_t buf[]="n";webSocket.broadcastBIN(buf,1);
+             uint8_t buf[]="n";webSocket.broadcastBIN(buf,1);  //notify clients that there is new data available
         }
   
         if ( updatejdtime < jd){  ///update tle and time
@@ -168,14 +167,12 @@ void loop() {
             }
         }
     }
-    #ifndef FREERUN
+
     if (millis() - socketrate > 33)
-    #endif
     {
         socketrate = millis();
         webSocketSendData();
     }
-    //webSocket.loop();
     
   }
   else if(WiFi.getMode() != WIFI_AP){  ///retry when failed getting data
@@ -264,13 +261,7 @@ void loop() {
   #ifdef DEBUG_frame
     framerate +=1;
   #endif
-  #ifdef DEBUG
-    Serial.flush();
-    if (Serial.available()){
-      Serial.read();
-      uint8_t buf[]="n";webSocket.broadcastBIN(buf,1);
-    }
-  #endif
+
   #ifdef USE_OTA
     ArduinoOTA.handle();
   #endif

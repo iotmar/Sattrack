@@ -1,18 +1,18 @@
-#define DEBUG
-#define DEBUG_frame
-#define USE_OTA
-//#define FREERUN
+#define DEBUG                 //Outputs some information in the serial port
+//#define DEBUG_frame         //Outputs every second the heap and looprate
+#define USE_OTA               //Use OTA (note: It's unprotected, use with care.)
 
-#define pred_size 10
-#define PIXELS 12
+#define pred_size 10          
+#define PIXELS 12             //Numbers of neopixels that is connected to the device
 
 
+NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);   //Connect the neopixels to GPIO2
 AsyncWebServer server(80);
 WebSocketsServer webSocket(81);
 Sgp4 sat;
 WiFiUDP UDPNTPClient;
 WiFiClient client;
-NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);
+
 
 unsigned long unixtime;
 double jdtime; 
