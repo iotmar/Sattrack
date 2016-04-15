@@ -3,26 +3,7 @@
 
 #include "FS.h"
 
-extern ESP8266WebServer server;
-
-//Opens file and send it to browser
-void sendbestand(const char* path,const char* content){
-  
-  if (!SPIFFS.exists(path)){
-     #ifdef DEBUG
-        Serial.println("File not found " + String(path));
-     #endif
-     server.send ( 400, "text/html", "Page not Found" );
-     return;
-  }
-  
-  File file = SPIFFS.open( path, "r" );
-  server.streamFile( file, content );
-  file.close();
-  #ifdef DEBUG
-    Serial.println("Send " + String(path));
-  #endif
-}
+extern AsyncWebServer server;
 
 //Concatinate char arrays and items
 class Stringbuffer {
@@ -44,6 +25,7 @@ class Stringbuffer {
                                                 strncat(buff, timebuff, BUFFER_SIZE - strlen(buff) - 1);
                                                }
     void add(double i){String cast = String(i);strncat(buff, cast.c_str(), BUFFER_SIZE - strlen(buff) - 1);}
+    void add(double i,unsigned char prec){char buffer [11];dtostrf(i,10,prec,buffer);String cast = String(buffer);cast.trim();strncat(buff,cast.c_str(), BUFFER_SIZE - strlen(buff) - 1);}
     void addColor(RgbColor c){ String i="#";
                                i+=String(c.R>>4,HEX);i+=String(c.R & 0xf,HEX);
                                i+=String(c.G>>4,HEX);i+=String(c.G & 0xf,HEX);
@@ -55,8 +37,10 @@ class Stringbuffer {
 };
 
 void closeAllConnections(){
-   server.close();
+   //server.close();
    webSocket.disconnect();
+   WiFiUDP::stopAll();
+   WiFiClient::stopAll();
 }
 
 /////////////////////////////////
@@ -108,116 +92,107 @@ void webSocketSendData(){
 //        Data handlers        //
 /////////////////////////////////
 
-void senddata(){
+////send data///
 
-    if (!dataError){
-        int year,mon,day,hr,min;
-        double sec;
+void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
+
+    int year,mon,day,hr,min;
+    double sec;
     
-        bool calc=false;
-        bool err=true;
-        
-        passinfo* Predictions;
-        
-        Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23));
+    Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 15);
     
-        if (server.args() > 0 && predError){   ///check for extra arguments
-            
-            char *ptr;
-            uint32_t unix = strtoul(server.arg(0).c_str(),&ptr,10);  ///read unix time
-            double jdC = getJulianFromUnix(unix);
-      
-            ///recalc new predictions
-            LedStrip.AnimStart(ANIM_WAIT);
-            
-            calc = true;
-            Predictions = new passinfo[pred_size];
-            if (server.argName(0) == "pre"){
-                err = predictPasses(Predictions,jdC, true);
-            }else if (server.argName(0) == "next"){
-                err = predictPasses(Predictions,jdC, false);
-            }else{
-                err = false;
+    if (!(predError || err)){
+        buf.add("tab|pass|8|");
+        buf.add(pred_size);
+        
+        for (int i = 0; i < pred_size; i++){
+          
+          invjday(Predictions[i].jdstart ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+          buf.add("|");buf.add(day);buf.add(" ");buf.add(monstr[mon]);
+          buf.add("|");buf.addTime(hr,min,sec);
+          buf.add("|");buf.add(Predictions[i].azstart);
+          
+          invjday(Predictions[i].jdmax ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+          buf.add("°|");buf.addTime(hr,min,sec);
+          buf.add("|");buf.add(Predictions[i].maxelevation);
+          
+          invjday(Predictions[i].jdstop ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+          buf.add("°|");buf.addTime(hr,min,sec);
+          buf.add("|");buf.add(Predictions[i].azstop);
+          
+          switch(Predictions[i].sight){
+                case lighted:
+                    buf.add("°|Visible");
+                    break;
+                case eclipsed:
+                    buf.add("°|Eclipsed");
+                    break;
+                case daylight:
+                    buf.add("°|Daylight");
+                    break;
             }
-    
-            LedStrip.AnimStop();
-            
-        }else{
-          Predictions = passPredictions;  /// normal prediction
         }
-        
-        if (predError && err){
-            buf.add("tab|pass|8|");
-            buf.add(pred_size);
-            
-            for (int i = 0; i < pred_size; i++){
-              
-              invjday(Predictions[i].jdstart ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-              buf.add("|");buf.add(day);buf.add(" ");buf.add(monstr[mon]);
-              buf.add("|");buf.addTime(hr,min,sec);
-              buf.add("|");buf.add(Predictions[i].azstart);
-              
-              invjday(Predictions[i].jdmax ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-              buf.add("°|");buf.addTime(hr,min,sec);
-              buf.add("|");buf.add(Predictions[i].maxelevation);
-              
-              invjday(Predictions[i].jdstop ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-              buf.add("°|");buf.addTime(hr,min,sec);
-              buf.add("|");buf.add(Predictions[i].azstop);
-              
-              switch(Predictions[i].sight){
-                    case lighted:
-                        buf.add("°|Visible");
-                        break;
-                    case eclipsed:
-                        buf.add("°|Eclipsed");
-                        break;
-                    case daylight:
-                        buf.add("°|Daylight");
-                        break;
-                }
-            }
-            buf.add("\ninput|pre|");buf.add(getUnixFromJulian(Predictions[0].jdmax));
-            buf.add("\ninput|next|");buf.add(getUnixFromJulian(Predictions[pred_size-1].jdmax));
-        }else{
-            buf.add("tab|pass|1|1|Error");
-            buf.add("\ninput|pre|0");
-            buf.add("\ninput|next|0");
-        }
-        buf.add("\ndiv|line1|");buf.add(sat.line1);
-        buf.add("\ndiv|line2|");buf.add(sat.line2);
-        invjday(sat.satrec.jdsatepoch ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-        buf.add("\ndiv|epoch|");buf.add(day);buf.add("/");buf.add(mon);buf.add("/");buf.add(year);buf.add(" ");buf.addTime(hr,min,sec);
-        buf.add("\ndiv|sat|");buf.add(sat.satName);
-        
-        server.send ( 200, "text/plain", buf.getPointer());
-    
-        #ifdef DEBUG
-          Serial.println("Send /data");
-        #endif
-    
-        if (calc){
-          delete Predictions;
-        }
-      
+        buf.add("\ninput|pre|");buf.add(getUnixFromJulian(Predictions[0].jdmax));
+        buf.add("\ninput|next|");buf.add(getUnixFromJulian(Predictions[pred_size-1].jdmax));
     }else{
-        server.send ( 400, "text/html", "Page not Found" );
+        buf.add("tab|pass|1|1|Error");
+        buf.add("\ninput|pre|0");
+        buf.add("\ninput|next|0");
+    }
+    buf.add("\ndiv|line1|");buf.add(sat.line1);
+    buf.add("\ndiv|line2|");buf.add(sat.line2);
+    invjday(sat.satrec.jdsatepoch ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+    buf.add("\ndiv|epoch|");buf.add(day);buf.add("/");buf.add(mon);buf.add("/");buf.add(year);buf.add(" ");buf.addTime(hr,min,sec);
+    buf.add("\ndiv|sat|");buf.add(sat.satName);
+    buf.add("\ndiv|off|");buf.add(config->offset);
+    
+    request->send ( 200, "text/plain", buf.getPointer());
+
+    #ifdef DEBUG
+      Serial.println("Send /data");
+    #endif
+   
+}
+
+///Handle request for data///
+
+void checkdata(AsyncWebServerRequest *request){
+    if (dataError){
+        request->send ( 400, "text/html", "Page not Found" );
+    }else{
+        int params = request->params();
+        if (params > 0 && !predError){   ///check for extra arguments => request prediction
+          
+            if (PredictRequest == NULL){
+                PredictRequest = request;    //calculation will be handeld in the main loop
+            }else{   //already an calculation busy
+                request->send(503);
+            }
+            
+        }else{
+            senddata(request, passPredictions, false); //send normal passPredictions
+        }
     }
 }
 
-void sendconfig(){
+///Send config settings///
+
+void sendconfig(AsyncWebServerRequest *request){
 
     if ( WiFi.getMode() != WIFI_AP){
-      if ( !server.authenticate(host,ap_password)){
-        server.requestAuthentication();
+      if ( !request->authenticate(config->host,config->ap_password)){
+        request->requestAuthentication();
         return;
       }
     }
-
-    Stringbuffer buf(43 + 75 + 15*12 + 16*4 + 19*6 + 138 + 13 + 16*3 +  20);
+    
+    Stringbuffer buf(43*3 + 75 + 15*12 + 23*2 + 16*4 + 19*6 + 138 + 13 + 16*3 +  20);
     
     buf.add("input|SSID|");buf.add(config->ssid);
+    buf.add("\ninput|HOST|");buf.add(config->host);
+    buf.add("\ninput|PASS|");buf.add(config->ap_password);
     buf.add("\ninput|PSK|");buf.add(config->password);
+
     buf.add("\ninput|ip_0|");buf.add(config->IP[0]);
     buf.add("\ninput|ip_1|");buf.add(config->IP[1]);
     buf.add("\ninput|ip_2|");buf.add(config->IP[2]);
@@ -231,10 +206,12 @@ void sendconfig(){
     buf.add("\ninput|gw_2|");buf.add(config->Gateway[2]);
     buf.add("\ninput|gw_3|");buf.add(config->Gateway[3]);
 
-    buf.add("\ninput|lat|");buf.add(config->lat);
-    buf.add("\ninput|lon|");buf.add(config->lon);
+    buf.add("\ninput|lat|");buf.add(config->lat,4);
+    buf.add("\ninput|lon|");buf.add(config->lon,4);
     buf.add("\ninput|alt|");buf.add(config->alt);
     buf.add("\ninput|sat|");buf.add(config->satnum);
+    buf.add("\ninput|off|");buf.add(config->offset);
+    buf.add("\ninput|sun|");buf.add(config->sunoffset);
 
     buf.add("\ninput|VisL|");buf.addColor(config->ColorVisL);
     buf.add("\ninput|VisH|");buf.addColor(config->ColorVisH);
@@ -249,54 +226,54 @@ void sendconfig(){
     buf.add("\nchk|ds|");buf.add((config->daylight ? "checked" : ""));
     buf.add("\nchk|DHCP|");buf.add((config->dhcp ? "checked" : ""));
     
-    server.send ( 200, "text/plain", buf.getPointer() );
+    request->send ( 200, "text/plain", buf.getPointer() );
 
     #ifdef DEBUG
       Serial.println("Send /config");
     #endif
 }
 
-////////////////////////////////////
-//      Login functions           //
-////////////////////////////////////
-/**
-void randomid(char p[]){
-   for (int i=0;i<10;i++){
-      p[i] = (char)random(65,90);
-   }
-   p[10] = '\0';
-}
-***/
+
 ////////////////////////////////////
 //      Init functions            //
 ////////////////////////////////////
 
+
 void initServer(){
-  
-    server.on("/", [](){sendbestand("/home.html","text/html");});
-    server.on("/home.html", [](){sendbestand("/home.html","text/html");});
-    server.on("/links.html", [](){sendbestand("/links.html","text/html");});
-    server.on("/about.html", [](){sendbestand("/about.html","text/html");});
-    server.on("/w3.css", [](){sendbestand("/w3.css","text/css");});
-    server.on("/favicon.ico", [](){sendbestand("/favicon.ico","image/ico");});
-    server.on("/microajax.js", [](){sendbestand("/microajax.js","text/javascript");});
-    server.on("/config",sendconfig);
-    server.on("/data", senddata);
-    
-    server.on("/settings.html", [](){
-      
+
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/home.html","text/html");});
+    server.on("/home.html", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/home.html","text/html");});
+    server.on("/links.html", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/links.html","text/html");});
+    server.on("/about.html", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/about.html","text/html");});
+    server.on("/w3.css", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/w3.css","text/css");});
+    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/favicon.ico","image/ico");});
+    server.on("/map.jpg", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/map.jpg","image/jpg");});
+    server.on("/microajax.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/microajax.js","text/javascript");});
+    server.on("/sunlight.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/sunlight.js","text/javascript");});  
+    server.on("/config", HTTP_ANY, sendconfig);
+    server.on("/data", HTTP_ANY, checkdata);
+    server.on("/site.appcache", HTTP_GET,[](AsyncWebServerRequest *request)
+        { AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/site.appcache","text/cache-manifest");
+          response->addHeader("Cache-Control","max-age=86400");
+          request->send(response);
+        });
+ 
+    server.on("/settings.html", [](AsyncWebServerRequest *request){
+
         if ( WiFi.getMode() != WIFI_AP){
-          if ( !server.authenticate(host,ap_password)){
-            server.requestAuthentication();
+          if ( !request->authenticate(config->host,config->ap_password)){
+            request->requestAuthentication();
             return;
           }
         }
-        saveNetworkSettings();
-        sendbestand("/settings.html","text/html");
+
+        saveNetworkSettings(request);
+        request->send(SPIFFS, "/settings.html","text/html");
+ 
         
     });
-    
-    
+    server.onNotFound([](AsyncWebServerRequest *request){request->send(404);});
+   
     server.begin();
     
 }
@@ -374,7 +351,7 @@ void initOTA(){
       });
     #endif
     
-    ArduinoOTA.setHostname(host);
+    ArduinoOTA.setHostname(config->host);
     ArduinoOTA.begin();
 }
 

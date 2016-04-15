@@ -20,7 +20,7 @@ bool predictPasses(){
       Serial.println();
     #endif
     
-    if ( !sat.initpredpoint( jdC , 0.0 )){
+    if ( !sat.initpredpoint( jdC , config->offset )){
         #ifdef DEBUG
             Serial.println("Can't find initial predpoint");
          #endif

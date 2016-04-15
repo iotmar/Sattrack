@@ -55,7 +55,6 @@ void Animo::AnimStop(){
 }
 
 void Animo::AnimStart(anim_mode m){
-    status = m;
     
     switch (m){
         case ANIM_STOP:
@@ -64,15 +63,15 @@ void Animo::AnimStart(anim_mode m){
 
         case ANIM_WAIT:
           frame = 0;
-
-          tick.attach_ms(100,animation);
+          if(status!=ANIM_WAIT){tick.detach();tick.attach_ms(100,animation);}
           break;
 
         case ANIM_FLASH:
           frame = 0;
-          tick.attach_ms(500,animation);
+          if(status!=ANIM_FLASH){tick.detach();tick.attach_ms(500,animation);}
  
     }
+    status = m;
 }
 
 void Animo::Animation(){
@@ -87,7 +86,7 @@ void Animo::Animation(){
           bus->SetPixelColor(frame, fcolor);
           frame = (frame+1)%PIXELS;
           bus->SetPixelColor(frame, fcolor);
-          bus->Show();
+          if(bus->CanShow()){bus->Show();}
       
           break;
 
@@ -99,7 +98,7 @@ void Animo::Animation(){
               frame = 1;
               bus->ClearTo(fcolor);
           }
-          bus->Show();
+          if(bus->CanShow()){bus->Show();}
           break;
    }  
 }

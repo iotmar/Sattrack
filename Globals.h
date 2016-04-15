@@ -1,22 +1,18 @@
-#define DEBUG
-#define DEBUG_frame
-#define USE_OTA
-//#define FREERUN
+#define DEBUG                 //Outputs some information in the serial port
+//#define DEBUG_frame         //Outputs every second the heap and looprate
+#define USE_OTA               //Use OTA (note: It's unprotected, use with care.)
 
-#define pred_size 10
-#define PIXELS 12
-
-
-const char* host = "Sattrack";
-const char* ap_password = "123456789";
+#define pred_size 10          
+#define PIXELS 12             //Numbers of neopixels that is connected to the device
 
 
-ESP8266WebServer server(80);
+NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);   //Connect the neopixels to GPIO2
+AsyncWebServer server(80);
 WebSocketsServer webSocket(81);
 Sgp4 sat;
 WiFiUDP UDPNTPClient;
 WiFiClient client;
-NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);
+
 
 unsigned long unixtime;
 double jdtime; 
@@ -28,6 +24,8 @@ typedef char str3[4];
 str3 monstr[13];
 
 passinfo passPredictions[pred_size];
+
+AsyncWebServerRequest *PredictRequest = NULL;
 
 #ifdef DEBUG
   
@@ -41,8 +39,13 @@ passinfo passPredictions[pred_size];
   }
 #endif
 
+enum state_mode {
+    RECALC,
+    RESTART,
+    IDLE
+}state;
 
 /////Flags//////
 
-bool predError = true;
+bool predError = false;
 bool dataError = false;

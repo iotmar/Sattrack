@@ -5,35 +5,37 @@ function setValues(url)
 	microAjax(url, function (res)
 	{
 		res.split(String.fromCharCode(10)).forEach(function(entry) {
-		var fields = entry.split("|");
-		if(fields[0] == "input")
-		{
-				document.getElementById(fields[1]).value = fields[2];
-		}
-		else if(fields[0] == "div")
-		{
-				document.getElementById(fields[1]).innerHTML  = fields[2];
-		}
-		else if(fields[0] == "chk")
-		{
-				document.getElementById(fields[1]).checked  = fields[2];
-		}
-		else if(fields[0] == "tab")
-		{
-				table = document.getElementById(fields[1]).getElementsByTagName("tbody")[0];
-				table.innerHTML="";
-				rows = Number(fields[3]);
-				coloms = Number(fields[2]);
-				for (i=0; i<rows; i++) {
-					row=document.createElement("tr");
-    				for (j=0; j<coloms; j++)    {
-						cell=document.createElement("td");
-						cell.appendChild(document.createTextNode(fields[4+coloms*i+j]));
-						row.appendChild(cell);
-					}
-					table.appendChild(row);
+			var fields = entry.split("|");
+			try{
+				if(fields[0] == "input")
+				{
+						document.getElementById(fields[1]).value = fields[2];
 				}
-		}
-	  });
+				else if(fields[0] == "div")
+				{
+						document.getElementById(fields[1]).innerHTML  = fields[2];
+				}
+				else if(fields[0] == "chk")
+				{
+						document.getElementById(fields[1]).checked  = fields[2];
+				}
+				else if(fields[0] == "tab")
+				{
+						table = document.getElementById(fields[1]).getElementsByTagName("tbody")[0];
+						table.innerHTML="";
+						rows = Number(fields[3]);
+						coloms = Number(fields[2]);
+						for (i=0; i<rows; i++) {
+							row=document.createElement("tr");
+							for (j=0; j<coloms; j++)    {
+								cell=document.createElement("td");
+								cell.appendChild(document.createTextNode(fields[4+coloms*i+j]));
+								row.appendChild(cell);
+							}
+							table.appendChild(row);
+						}
+				}
+			}catch(err) {}
+	  	});
 	});
 }
