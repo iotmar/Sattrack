@@ -1,12 +1,12 @@
-+# Sattrack
- +Sattrack is a small device that sits on your desk, and warn you when the Iss is overflying. It does this by using the Simplified perturbations model (SGP4) for calculating the current position of the satellite. This code is made for the ESP8266 and use the [arduino-core](https://github.com/esp8266/Arduino).
+# Sattrack
+ Sattrack is a small device that sits on your desk, and warn you when the Iss is overflying. It does this by using the Simplified perturbations model (SGP4) for calculating the current position of the satellite. This code is made for the ESP8266 and use the [arduino-core](https://github.com/esp8266/Arduino).
  
- +# Hardware
- +- ESP8266-01
- +- Voltage regulator: LM1117 3.3V
- +- Logic level converter (perhaps unnecessary)
- +- Neopixel ring connected to GPIO2
- +- Resistors,capacitors,...
+# Hardware
+- ESP8266-01
+- Voltage regulator: LM1117 3.3V
+- Logic level converter (perhaps unnecessary)
+- Neopixel ring connected to GPIO2
+- Resistors,capacitors,...
 
 # External libraries
 - [Sgp4-Library](https://github.com/Hopperpop/Sgp4-Library)
