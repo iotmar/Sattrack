@@ -37,5 +37,6 @@ function setValues(url)
 				}
 			}catch(err) {}
 	  	});
+		try{drawDayNightMap(mapImage);} catch(err) {}
 	});
 }

@@ -99,7 +99,7 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
     int year,mon,day,hr,min;
     double sec;
     
-    Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 15);
+    Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 3*15);
     
     if (!(predError || err)){
         buf.add("tab|pass|8|");
@@ -144,7 +144,10 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
     invjday(sat.satrec.jdsatepoch ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
     buf.add("\ndiv|epoch|");buf.add(day);buf.add("/");buf.add(mon);buf.add("/");buf.add(year);buf.add(" ");buf.addTime(hr,min,sec);
     buf.add("\ndiv|sat|");buf.add(sat.satName);
+    
     buf.add("\ndiv|off|");buf.add(config->offset);
+    buf.add("\ndiv|clat|");buf.add(config->lat);
+    buf.add("\ndiv|clon|");buf.add(config->lon);
     
     request->send ( 200, "text/plain", buf.getPointer());
 

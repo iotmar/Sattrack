@@ -150,8 +150,12 @@ function drawDayNightMap(mapImage)
 				ctx.fillRect(x, rectTop, 1, rectHeight);                                             				
 				break;
 			}    
-		}   
-	                    
+		}
+	ctx.strokeStyle = 'black';
+	var lon = - parseFloat(document.getElementById("clon").innerHTML);
+	var lat = parseFloat(document.getElementById("clat").innerHTML);
+	if (lon<0){lon += 360.0;}
+	drawCircle(ctx, pixelX(lon), pixelY(lat), 3, "#FFFF00");        
 }		
 
 // Source: Henning Umland, http://www.celnav.de/longterm.htm
