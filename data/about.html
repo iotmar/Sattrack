@@ -18,13 +18,13 @@
 
 <div class="w3-padding-jumbo w3-centered">
     <h1 class="w3-center" id="sat">Sattrack</h1>
-    Sattrack is a project that started simple, but ended with more features than I ever could imagine. The first version was a single Led that turned on when the ISS overflew. It used an API to find the rise and set time, but it couldn't tell how high it will rise or if it will be a visible pass. <br>
-    After I found the SGP4 model, all those limitations disappeared. The model is used to find the position of the sattelite in real time and for predicting overpasses. Most information on how to do this, was found on the CelesTrak website.<br>
-    <br>
-    This project was also a learning exercise. When I started the project, I wasn't familiar with C++ and webdesign. You can't say that I ended as a good developer, but now I have at least some understanding about those topics and hopefully it becomes usefull some day.
+    <p>Every day the Internation Space Station makes more than 15 orbits around the earth, and sometimes is passes over your head. Most of the time you don't notice. You're busy living your life, and forget about the astronauts up there doing experiments for science. That's why this device is created. It notifies you when the ISS is near and even when it's visible in the sky. That way you never forget about this great achievement of mankind, and you will always know when to go outside to watch it fly by.</p>
+    
+    <p>Knowing where a satellite is at a specific moment isn't that easy. There are a lot of forces working on a satellite and only using a kepler orbit won't suffice for calculating its position. That's why the simplified perturbations model (SGP) was made. It tries to correct the error caused by the imperfect Earth shape, atmospheric drag, radiation from the sun, and gravitational effects of the sun and the moon. Even with all these corrections the orbit will slowly decay from the actual position. Using a recent two-line element set (TLE) will counter this. These sets are made from observations from NORAD and define the orbit of the satellite around the epoch time. This device will automatically update the TLE, so that the error is reduced as much as possible.</p>
+    
+    <p>Sattrack was made as a hobby and learning project. There is no warranty that it will work perfectly. If you find a bug, report it on the <a href="https://github.com/Hopperpop/Sattrack">Github page</a> and hopefully it will be fixed.</p>
     
 </div>
-<br>
 <center>Copyright &copy 2016 by Hopperpop</center>
 
 </body>
