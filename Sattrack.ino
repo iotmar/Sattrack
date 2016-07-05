@@ -280,6 +280,7 @@ void loop() {
     EEPROM.getDataPtr();
     EEPROM.commit();
 
+    //small animation
     LedStrip.SetAnimColor(127,0,255);
     LedStrip.AnimStart(ANIM_WAIT);
     delay(2000);

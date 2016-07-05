@@ -4,6 +4,7 @@
 
 #define pred_size 10          
 #define PIXELS 12             //Numbers of neopixels that is connected to the device
+#define buttonPin 0           //Pinnumber for factoryreset button
 
 
 NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);   //Connect the neopixels to GPIO2
@@ -19,6 +20,7 @@ double jdtime;
 double updatejdtime;
 unsigned long timemillis;
 unsigned long socketrate = 0;
+bool prevButtonState = true;
 unsigned long pressTime;
 
 typedef char str3[4];
