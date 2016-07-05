@@ -40,6 +40,8 @@ void setup() {
   
   SPIFFS.begin();
 
+  pinMode(buttonPin, INPUT);
+
   #ifdef DEBUG
     Serial.begin(115200);
     Serial.println();
@@ -265,6 +267,25 @@ void loop() {
   #ifdef USE_OTA
     ArduinoOTA.handle();
   #endif
+
+
+  ///resetbutton///
+  bool state = digitalRead(buttonPin);
+  if (!state && prevButtonState){
+    pressTime = millis();
+  }
+  if (millis() - pressTime > 5000 && !state){  //button pressed for 5 sec
+    //save defaultconfigs
+    setDefaultConfig();
+    EEPROM.getDataPtr();
+    EEPROM.commit();
+
+    LedStrip.SetAnimColor(127,0,255);
+    LedStrip.AnimStart(ANIM_WAIT);
+    delay(2000);
+    ESP.restart();
+  }
+  prevButtonState = state;
 
 }
 

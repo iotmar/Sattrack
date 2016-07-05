@@ -19,6 +19,7 @@ double jdtime;
 double updatejdtime;
 unsigned long timemillis;
 unsigned long socketrate = 0;
+unsigned long pressTime;
 
 typedef char str3[4];
 str3 monstr[13];
