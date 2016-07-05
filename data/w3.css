@@ -3,7 +3,7 @@ input[type=number] {-moz-appearance:textfield;}
 button[type=summit] {position: absolute;bottom: 20px;right: 20px;}
 .settings {display: inline-block;margin: 1em;vertical-align: top;position:relative;width:450px;}
 input[type=color] {max-width:80px;}
-legend > h4 {padding:0px 4px;}
+legend > h4 {padding:0px 4px;margin: 0}
 
 /* W3.CSS 1.85 by J.E.Refsnes. Do not remove this line. */
 *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
