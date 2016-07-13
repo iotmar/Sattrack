@@ -6,6 +6,9 @@
 <link href="w3.css" rel="stylesheet" type="text/css">
 <script src="/microajax.js"></script>
 <script src="/sunlight.js"></script>
+<style>
+	#pass tr td:nth-child(n+9), th:nth-child(n+9) {display: none;}
+</style>
 </head>
 
 <body>
@@ -111,9 +114,7 @@ window.onload=function (){
 		var vis;
 		switch(dv.getInt16(48,en)){case 0:vis="Eclipsed";break;case -2:vis="Not visible";break;case -1:vis="Daylight";break;default:vis="Visible";}
 		inner('vis',vis);
-		time=new Date(dv.getFloat64(50,en));
-		var dt=time.toTimeString().split(' ');
-		inner('time',dt[0]);
+		inner('time',dv.getInt32(50,en)+":"+("0"+dv.getInt32(54,en)).slice(-2)+":"+("0"+dv.getInt32(58,en)).slice(-2));
 	}
 	sock.onclose=function(){inner('con','Closed');}
 	sock.onopen=function(){inner('con','Running');initmap();}

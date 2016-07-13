@@ -118,9 +118,6 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
 
     int params = request->params();
     if (params > 0 ){
-
-      bool restart = false;
-      bool recalc = false;
       
       int part = request->getParam(0)->value().toInt();
       
@@ -170,7 +167,7 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
               else if (request->getParam(i)->name() == "EclH") {config->ColorEclH = HexColorToRgb(request->getParam(i)->value());}
               else if (request->getParam(i)->name() == "ds") {config->daylight = true;}
               else if (request->getParam(i)->name() == "ts") {strlcpy(config->ntpServerName,request->getParam(i)->value().c_str(),sizeof(ConfigStruct::ntpServerName));}
-              else if (request->getParam(i)->name() == "tz") {config->timezone =  (int8_t)request->getParam(i)->value().toInt();}
+              else if (request->getParam(i)->name() == "tz") {config->timezone =  (int8_t)request->getParam(i)->value().toInt();state = RESEND;}
           }
       }
 

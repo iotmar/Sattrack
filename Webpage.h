@@ -71,10 +71,13 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
 }
 
 void webSocketSendData(){
-    
-    double unix = (sat.satJd - 2440587.5)*86400000.0;   //unix in millis 
 
-    uint8_t buffer[sizeof(double)*7+sizeof(int16_t)];
+    int year,mon,day,hr,min,secc;
+    double sec;
+    invjday(sat.satJd ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+    secc = sec;
+
+    uint8_t buffer[sizeof(double)*7+sizeof(int16_t)+sizeof(int)*3];
     
     memcpy(&buffer[0],&sat.satLon,sizeof(double));
     memcpy(&buffer[sizeof(double)],&sat.satLat,sizeof(double));
@@ -83,7 +86,9 @@ void webSocketSendData(){
     memcpy(&buffer[sizeof(double)*4],&sat.satEl,sizeof(double));
     memcpy(&buffer[sizeof(double)*5],&sat.satDist,sizeof(double));
     memcpy(&buffer[sizeof(double)*6],&sat.satVis,sizeof(int16_t));
-    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)],&unix,sizeof(double));
+    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)],&hr,sizeof(int));
+    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+sizeof(int)],&min,sizeof(int));
+    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+2*sizeof(int)],&secc,sizeof(int));
 
     webSocket.broadcastBIN(buffer, sizeof(buffer));
 }

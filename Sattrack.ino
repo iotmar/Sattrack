@@ -256,6 +256,13 @@ void loop() {
           ESP.restart();
           state=IDLE;
           break;
+
+       case RESEND:
+          uint8_t buf[]="n";
+          webSocket.broadcastBIN(buf,1);  //notify clients that there is new data available
+          state=IDLE;
+          break;
+          
   }
 
   ///OTA and debug////

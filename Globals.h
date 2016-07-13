@@ -1,13 +1,13 @@
-#define DEBUG                 //Outputs some information in the serial port
-//#define DEBUG_frame         //Outputs every second the heap and looprate
-#define USE_OTA               //Use OTA (note: It's unprotected, use with care.)
+//#define DEBUG                 //Outputs some information in the serial port
+//#define DEBUG_frame           //Outputs every second the heap and looprate
+//#define USE_OTA               //Use OTA (note: It's unprotected, use with care.)
 
 #define pred_size 10          
 #define PIXELS 12             //Numbers of neopixels that is connected to the device
-#define buttonPin 0           //Pinnumber for factoryreset button
+#define buttonPin 0           //Pinnumber for factoryreset button, default GPIO0. Button to ground + 10k pull up resistor
 
 
-NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);   //Connect the neopixels to GPIO2
+NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> strip(PIXELS, 2);   //Connect the neopixels to GPIO2, change NeoGrbFeature if needed
 AsyncWebServer server(80);
 WebSocketsServer webSocket(81);
 Sgp4 sat;
@@ -45,6 +45,7 @@ AsyncWebServerRequest *PredictRequest = NULL;
 enum state_mode {
     RECALC,
     RESTART,
+    RESEND,
     IDLE
 }state;
 
