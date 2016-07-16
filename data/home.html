@@ -7,11 +7,52 @@
 <script src="/microajax.js"></script>
 <script src="/sunlight.js"></script>
 <style>
-	#pass tr td:nth-child(n+9), th:nth-child(n+9) {display: none;}
+#pass tr td:nth-child(n+9), th:nth-child(n+9) {display: none;}
+#pass tbody tr:hover td {background:#dae4f1;cursor: pointer;}
+#small tbody tr td:first-child {text-align:left;}
+.vertical-alignment-helper {
+	display:table;
+	height: 100%;
+	width: 100%;
+	pointer-events:none;
+}
+.vertical-align-center {
+    display: table-cell;
+    vertical-align: middle;
+    pointer-events:none;
+}
 </style>
 </head>
 
 <body>
+
+<div id="id01" class="w3-modal">
+	<div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center">
+              <div class="w3-modal-content w3-animate-top w3-card-8" style="max-width: 700px">
+                <header class="w3-container w3-blue">
+                  <span onclick="document.getElementById('id01').style.display='none'"
+                  class="w3-closebtn">&times;</span>
+                  <h4 id="mh" style="margin: 5px 0;">Modal Header</h4>
+                </header>
+                <div class="w3-container w3-padding-8">
+                  <table id="small" class="w3-centered w3-striped">
+                    <thead>
+                        <tr>
+                          <th></th>
+                          <th>Time</th>
+                          <th>Azimuth</th>
+                          <th>Elevation</th>
+                          <th>Visibility</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+       	</div>
+    </div>
+</div>
 
 <div class="w3-topnav w3-large w3-blue">
   <a href="/home.html" onclick="return sclose();">Home</a>
@@ -54,13 +95,13 @@
       <th>Elevation</th>
       <th>Endtime</th>
       <th>Azimuth</th>
-      <th>Visible</th>
+      <th>Visibility</th>
     </tr>
 </thead>
  <tfoot class="w3-blue">
     <tr>
       <td colspan="4" style="text-align:left;"><small>Start and end elevation: <span id="off">0.0</span>°</small></td>
-      <td colspan="4" style="text-align:right;"><small>Lat:<span id="clat">0.0</span>° Lon:<span id="clon">0.0</span>°</small></td>
+      <td colspan="4" style="text-align:right;"><small>Lat:<span id="clat">0.0</span>°&emsp;Lon:<span id="clon">0.0</span>°</small></td>
     </tr>
   </tfoot>
 <tbody><tr><th></th></tr></tbody>
@@ -119,6 +160,14 @@ window.onload=function (){
 	sock.onclose=function(){inner('con','Closed');}
 	sock.onopen=function(){inner('con','Running');initmap();}
 	sock.onerror=function(){inner('con','Error');sock.close();}
+	
+}
+
+var modal = document.getElementById('id01');
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
 }
 
 function calc(e){
@@ -127,6 +176,72 @@ function calc(e){
 		setValues('/data?'+e+"="+n);
 	}
 	return false;
+}
+
+function tableHandler(){
+	var rows = document.getElementById('pass').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    for (i = 0; i < rows.length; i++) {
+        rows[i].onclick = function() {
+			
+			function en(a){
+				switch(Number(a)){
+					case 0:
+						return "Daylight";
+					case 1:
+						return "Eclipsed";
+					case 2:
+						return "Visible";	
+				}
+			}
+			
+			var cells = this.getElementsByTagName('td');
+			if (cells[1].innerHTML != ""){
+				var r=0;
+				var table = document.getElementById("small").getElementsByTagName("tbody")[0];
+				table.innerHTML="";
+				cont = ["Start",cells[1].innerHTML,cells[2].innerHTML,document.getElementById("off").innerHTML+"°",en(cells[14].innerHTML)]
+				function addtrans(){
+					if(cells[8].innerHTML=="1"){cont.push("Entering Earth's shadow");}
+					else{cont.push("Leaving Earth's shadow");}
+					cont.push(cells[9].innerHTML,cells[10].innerHTML+"°",cells[11].innerHTML+"°");
+					if(cells[17].innerHTML=="0"){cont.push(en(cells[17].innerHTML));}
+					else{cont.push("-");}
+				}
+				function addmax(){
+					cont.push("Maximum elevation",cells[3].innerHTML,cells[13].innerHTML+"°",cells[4].innerHTML,en(cells[16].innerHTML));
+				}
+				if (cells[8].innerHTML=="0"){
+					addmax();
+					r=3;	
+				}else{
+					r=4;
+					if(cells[12].innerHTML=="0"){
+						addtrans();
+						addmax();
+					}else{
+						addmax();
+						addtrans();
+					}
+				}
+				cont.push("End",cells[5].innerHTML,cells[6].innerHTML,document.getElementById("off").innerHTML+"°",en(cells[15].innerHTML));
+				
+				for (i=0; i<r; i++) {
+					var row=document.createElement("tr");
+					for (j=0; j<5; j++)    {
+						var cell=document.createElement("td");
+						cell.appendChild(document.createTextNode(cont[5*i+j]));
+						row.appendChild(cell);
+					}
+					table.appendChild(row);
+				}
+				
+				function m(s){c=s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();a="ember,ember,ober,tember,ust,y,e,,il,ch,ruary,uary".split(",");b=[];for(i=12;i--;)b[(""+new Date(1,i,1)).slice(4,7)]=11-i;return c+a[b[c]];}
+				var day=cells[0].innerHTML.split(' ');
+				document.getElementById("mh").innerHTML=m(day[1])+" "+day[0];
+				document.getElementById('id01').style.display='block';
+			}
+        }
+    }	
 }
 
 function sclose(){

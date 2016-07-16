@@ -104,28 +104,28 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
     int year,mon,day,hr,min;
     double sec;
     
-    Stringbuffer buf( 12+86*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 3*15);
+    Stringbuffer buf( 12 + 128*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 3*15);
     
     if (!(predError || err)){
-        buf.add("tab|pass|8|");
+        buf.add("tab|pass|18|");
         buf.add(pred_size);
         
         for (int i = 0; i < pred_size; i++){
           
           invjday(Predictions[i].jdstart ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-          buf.add("|");buf.add(day);buf.add(" ");buf.add(monstr[mon]);
-          buf.add("|");buf.addTime(hr,min,sec);
-          buf.add("|");buf.add(Predictions[i].azstart);
+          buf.add("|");buf.add(day);buf.add(" ");buf.add(monstr[mon]);                                            //day
+          buf.add("|");buf.addTime(hr,min,sec);                                                                   //starttime
+          buf.add("|");buf.add(Predictions[i].azstart);                                                           //start azimuth
           
           invjday(Predictions[i].jdmax ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-          buf.add("°|");buf.addTime(hr,min,sec);
-          buf.add("|");buf.add(Predictions[i].maxelevation);
+          buf.add("°|");buf.addTime(hr,min,sec);                                                                  //maxtime
+          buf.add("|");buf.add(Predictions[i].maxelevation);                                                      //max elevation
           
           invjday(Predictions[i].jdstop ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-          buf.add("°|");buf.addTime(hr,min,sec);
-          buf.add("|");buf.add(Predictions[i].azstop);
+          buf.add("°|");buf.addTime(hr,min,sec);                                                                  //stoptime
+          buf.add("|");buf.add(Predictions[i].azstop);                                                            //stop azimuth
           
-          switch(Predictions[i].sight){
+          switch(Predictions[i].sight){                                                                           //visibility
                 case lighted:
                     buf.add("°|Visible");
                     break;
@@ -135,7 +135,30 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
                 case daylight:
                     buf.add("°|Daylight");
                     break;
+          }
+
+          buf.add("|");buf.add((int)Predictions[i].transit);                                                      //transit type
+          if ( Predictions[i].transit != none){
+            invjday(Predictions[i].jdtransit ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+            buf.add("|");buf.addTime(hr,min,sec);                                                                 //transistion time
+            buf.add("|");buf.add(Predictions[i].aztransit);                                                       //trans azimuth
+            buf.add("|");buf.add(Predictions[i].transitelevation);                                                //trans elevation
+            if (Predictions[i].jdtransit<Predictions[i].jdmax){                                                   //sorting
+              buf.add("|0|");
+            }else{
+              buf.add("|1|");
             }
+          }else{
+            buf.add("|-|-|-|-|");                                                                                                             
+          }
+
+          buf.add(Predictions[i].azmax);                                                                          //maxiumum azimuth
+          buf.add("|");buf.add((int)Predictions[i].visstart);                                                     //visibility start
+          buf.add("|");buf.add((int)Predictions[i].visstop);                                                      //visibility stop
+          buf.add("|");buf.add((int)Predictions[i].vismax);                                                       //visibility max
+          buf.add("|");buf.add((int)Predictions[i].vistransit);                                                   //visibility transit
+          
+          
         }
         buf.add("\ninput|pre|");buf.add(getUnixFromJulian(Predictions[0].jdmax));
         buf.add("\ninput|next|");buf.add(getUnixFromJulian(Predictions[pred_size-1].jdmax));

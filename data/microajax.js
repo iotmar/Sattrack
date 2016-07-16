@@ -21,14 +21,14 @@ function setValues(url)
 				}
 				else if(fields[0] == "tab")
 				{
-						table = document.getElementById(fields[1]).getElementsByTagName("tbody")[0];
+						var table = document.getElementById(fields[1]).getElementsByTagName("tbody")[0];
 						table.innerHTML="";
-						rows = Number(fields[3]);
-						coloms = Number(fields[2]);
+						var rows = Number(fields[3]);
+						var coloms = Number(fields[2]);
 						for (i=0; i<rows; i++) {
-							row=document.createElement("tr");
+							var row=document.createElement("tr");
 							for (j=0; j<coloms; j++)    {
-								cell=document.createElement("td");
+								var cell=document.createElement("td");
 								cell.appendChild(document.createTextNode(fields[4+coloms*i+j]));
 								row.appendChild(cell);
 							}
@@ -37,6 +37,7 @@ function setValues(url)
 				}
 			}catch(err) {}
 	  	});
-		try{drawDayNightMap(mapImage);} catch(err) {}
+		try{drawDayNightMap(mapImage);}catch(err) {}
+		try{tableHandler();}catch(err) {}
 	});
 }
