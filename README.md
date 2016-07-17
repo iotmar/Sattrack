@@ -1,10 +1,12 @@
 # Sattrack
  Sattrack is a small device that sits on your desk, and warn you when the Iss is overflying. It does this by using the Simplified perturbations model (SGP4) for calculating the current position of the satellite. This code is made for the ESP8266 and use the [arduino-core](https://github.com/esp8266/Arduino).
  
+ Follow this project on [hackaday.io](https://hackaday.io/project/12607-sattrack-iss-indicator).
+ 
 # Hardware
 - ESP8266-01
 - Voltage regulator: LM1117 3.3V
-- Logic level converter (perhaps unnecessary)
+- (Logic level converter)
 - Neopixel ring connected to GPIO2
 - Resistors,capacitors,...
 
@@ -16,7 +18,7 @@
 - [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) by me-no-dev
 
 # Installation instructions
-- Install the arduino-core for the ESP8266 (recommended version: stable version 2.1.0).
+- Install the arduino-core for the ESP8266.
 - Install the external libraries.
 - Enable AsyncTCP in the arduinoWebSockets library. This mode can be activated in the file 'WebSockets.h' (see WEBSOCKETS_NETWORK_TYPE define).
 - Change CPU frequency to 160 MHz and use minimum 192k SPIFFS.
