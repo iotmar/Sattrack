@@ -72,7 +72,9 @@
         <div class="w3-card-4" style="margin: 0 auto;position: relative;width:750px; height:375px">
           <canvas id="map" style="display:block;position: absolute;left:0;top:0;z-index:0;">
           </canvas>
-          <canvas id="dot" style="display:block;position: absolute;left:0;top:0;z-index:1;">
+          <canvas id="orbit" style="display:block;position: absolute;left:0;top:0;z-index:1;">
+          </canvas>
+          <canvas id="dot" style="display:block;position: absolute;left:0;top:0;z-index:2;">
             Your browser does not support HTML5 canvas.
           </canvas>
         </div>
@@ -144,21 +146,32 @@ window.onload=function (){
 		sock.send(1);
 		var da=e.data;
 		var dv=new DataView(da);
-		if (dv.byteLength == 1){setTimeout(function e(){setValues("/data");},Math.random()*2000);return;}
-		function get(e,n,l){inner(e,dv.getFloat64(n,en).toFixed(2).toString()+l);}
-		get('lon',0,'°');
-		get('lat',8,'°');
-		get('alt',16,' km');
-		get('az',24,'°');
-		get('el',32,'°');
-		get('dist',40,' km');
-		var vis;
-		switch(dv.getInt16(48,en)){case 0:vis="Eclipsed";break;case -2:vis="Not visible";break;case -1:vis="Daylight";break;default:vis="Visible";}
-		inner('vis',vis);
-		inner('time',dv.getInt32(50,en)+":"+("0"+dv.getInt32(54,en)).slice(-2)+":"+("0"+dv.getInt32(58,en)).slice(-2));
+		var type=String.fromCharCode(dv.getUint8(0));
+		if (type=="n"){setTimeout(function e(){setValues("/data");},Math.random()*1500);return;}
+		if (type=="p"){
+			function get(e,n,l){inner(e,dv.getFloat64(n,en).toFixed(2).toString()+l);}
+			get('lon',1,'°');
+			get('lat',9,'°');
+			get('alt',17,' km');
+			get('az',25,'°');
+			get('el',33,'°');
+			get('dist',41,' km');
+			var vis;
+			switch(dv.getInt16(49,en)){case 0:vis="Eclipsed";break;case -2:vis="Not visible";break;case -1:vis="Daylight";break;default:vis="Visible";}
+			inner('vis',vis);
+			inner('time',dv.getInt32(51,en)+":"+("0"+dv.getInt32(55,en)).slice(-2)+":"+("0"+dv.getInt32(59,en)).slice(-2));return;
+		}
+		if (type=="o"){
+			orbit_size = dv.getUint8(1);
+			for (i=0;i<orbit_size;i++){
+				orbitLon[i]=dv.getFloat64(2+8*i,en);
+				orbitLat[i]=dv.getFloat64(2+8*i+orbit_size*8,en);
+			}
+			try{drawOrbit();}catch(err){}
+		}
 	}
 	sock.onclose=function(){inner('con','Closed');}
-	sock.onopen=function(){inner('con','Running');initmap();}
+	sock.onopen=function(){inner('con','Running');initmap();orbit_size=0;orbitLon=[];orbitLat=[];}
 	sock.onerror=function(){inner('con','Error');sock.close();}
 	
 }

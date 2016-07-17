@@ -100,7 +100,9 @@ void setup() {
   ///get tle and time
   UDPNTPClient.begin(2390);
   if (!dataError){
-    if (!(updateTime() && getTle(config->satnum))){
+    bool timeFlag = updateTime();
+    bool TleFlag = getTle(config->satnum);
+    if (!(timeFlag && TleFlag)){
         #ifdef DEBUG
           Serial.println("Can't get data");
           Serial.println();
@@ -170,6 +172,11 @@ void loop() {
         }
     }
 
+    if(jd > orbit.lastJd-orbit.step*(orbit_size/2-1)){
+        updateOrbit();
+        webSocketSendOrbit();
+    }
+
     if (millis() - socketrate > 33)
     {
         socketrate = millis();
@@ -184,7 +191,7 @@ void loop() {
                 Serial.println("Can't get data");
                 Serial.println();
               #endif
-              updatejdtime = jd + 0.000694;   // retry update in 1 min
+              updatejdtime = jd + 0.003472;   // retry update in 5 min
           }else{
               dataError = false;
               LedStrip.AnimStop();
@@ -242,7 +249,7 @@ void loop() {
               LedStrip.SetAnimColor(0x9f,0x0,0x0);
               LedStrip.AnimStart(ANIM_FLASH);
               dataError = true;
-              updatejdtime = getJulianTime() + 0.000694;   // retry update in 1 min
+              updatejdtime = getJulianTime() + 0.003472;   // retry update in 5 min
           }else{
               LedStrip.AnimStop();
               dataError = false;

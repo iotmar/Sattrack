@@ -2,7 +2,8 @@
 //#define DEBUG_frame           //Outputs every second the heap and looprate
 //#define USE_OTA               //Use OTA (note: It's unprotected, use with care.)
 
-#define pred_size 10          
+#define pred_size 10 
+#define orbit_size 100         
 #define PIXELS 12             //Numbers of neopixels that is connected to the device
 #define buttonPin 0           //Pinnumber for factoryreset button, default GPIO0. Button to ground + 10k pull up resistor
 
@@ -48,6 +49,13 @@ enum state_mode {
     RESEND,
     IDLE
 }state;
+
+struct orbit_path {
+    double lon[orbit_size];
+    double lat[orbit_size];
+    double lastJd;
+    double step;
+}orbit;
 
 /////Flags//////
 

@@ -5,6 +5,10 @@
 
 double getJulianTime();
 
+//////////////////////////////////////
+//           Overpass               //
+//////////////////////////////////////
+
 ///update all predictions
 bool predictPasses(){
 
@@ -101,6 +105,30 @@ bool predictPasses(passinfo passPredictions[pred_size],double jdC, bool directio
 
     sat.setpredpoint(jdSave);
     return true;
+}
+
+//////////////////////////////////////
+//           Orbit                  //
+//////////////////////////////////////
+
+void calcOrbit(){
+    orbit.step = 1.0/(sat.revpday*orbit_size);
+    orbit.lastJd = getJulianTime()+(orbit_size/2)*orbit.step;
+    
+    for (int i=0;i<orbit_size;i++){
+        sat.findsat(orbit.lastJd-orbit.step*(orbit_size-1-i));
+        orbit.lat[i]=sat.satLat;
+        orbit.lon[i]=sat.satLon;
+    }
+}
+
+void updateOrbit(){
+    memcpy(orbit.lat,&orbit.lat[1],sizeof(double)*(orbit_size-1));
+    memcpy(orbit.lon,&orbit.lon[1],sizeof(double)*(orbit_size-1));
+    orbit.lastJd += orbit.step;
+    sat.findsat(orbit.lastJd);
+    orbit.lat[orbit_size-1]=sat.satLat;
+    orbit.lon[orbit_size-1]=sat.satLon;
 }
 
 

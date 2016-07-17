@@ -47,6 +47,48 @@ void closeAllConnections(){
 //        Websocket            //
 /////////////////////////////////
 
+void webSocketSendData(){
+
+    int year,mon,day,hr,min,secc;
+    double sec;
+    invjday(sat.satJd ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
+    secc = sec;
+
+    uint8_t* buffer = new uint8_t[sizeof(double)*7+sizeof(int16_t)+sizeof(int)*3+1];
+    
+    buffer[0]='p';
+    memcpy(&buffer[1],&sat.satLon,sizeof(double));
+    memcpy(&buffer[sizeof(double)+1],&sat.satLat,sizeof(double));
+    memcpy(&buffer[sizeof(double)*2+1],&sat.satAlt,sizeof(double));
+    memcpy(&buffer[sizeof(double)*3+1],&sat.satAz,sizeof(double));
+    memcpy(&buffer[sizeof(double)*4+1],&sat.satEl,sizeof(double));
+    memcpy(&buffer[sizeof(double)*5+1],&sat.satDist,sizeof(double));
+    memcpy(&buffer[sizeof(double)*6+1],&sat.satVis,sizeof(int16_t));
+    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+1],&hr,sizeof(int));
+    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+sizeof(int)+1],&min,sizeof(int));
+    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+2*sizeof(int)+1],&secc,sizeof(int));
+
+    webSocket.broadcastBIN(buffer, sizeof(double)*7+sizeof(int16_t)+sizeof(int)*3+1);
+    delete[] buffer;
+}
+
+void webSocketSendOrbit(uint8_t num){
+    uint8_t* buffer = new uint8_t[sizeof(double)*orbit_size*2+2];
+    buffer[0] = 'o';
+    buffer[1] = orbit_size;
+    memcpy(buffer+2,&orbit,sizeof(double)*orbit_size*2);
+    if (num == 255){
+      webSocket.broadcastBIN(buffer,sizeof(double)*orbit_size*2+2);
+    }else{
+      webSocket.sendBIN(num,buffer,sizeof(double)*orbit_size*2+2);
+    }
+    delete[] buffer;
+}
+
+void webSocketSendOrbit(){
+  webSocketSendOrbit(255);
+}
+
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght) {
 
     switch(type) {
@@ -62,35 +104,14 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
                 Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
                 if (dataError){
                     webSocket.disconnect();
+                }else{
+                    webSocketSendOrbit(num);
                 }
             #endif
             break;
             
     }
 
-}
-
-void webSocketSendData(){
-
-    int year,mon,day,hr,min,secc;
-    double sec;
-    invjday(sat.satJd ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
-    secc = sec;
-
-    uint8_t buffer[sizeof(double)*7+sizeof(int16_t)+sizeof(int)*3];
-    
-    memcpy(&buffer[0],&sat.satLon,sizeof(double));
-    memcpy(&buffer[sizeof(double)],&sat.satLat,sizeof(double));
-    memcpy(&buffer[sizeof(double)*2],&sat.satAlt,sizeof(double));
-    memcpy(&buffer[sizeof(double)*3],&sat.satAz,sizeof(double));
-    memcpy(&buffer[sizeof(double)*4],&sat.satEl,sizeof(double));
-    memcpy(&buffer[sizeof(double)*5],&sat.satDist,sizeof(double));
-    memcpy(&buffer[sizeof(double)*6],&sat.satVis,sizeof(int16_t));
-    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)],&hr,sizeof(int));
-    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+sizeof(int)],&min,sizeof(int));
-    memcpy(&buffer[sizeof(double)*6+sizeof(int16_t)+2*sizeof(int)],&secc,sizeof(int));
-
-    webSocket.broadcastBIN(buffer, sizeof(buffer));
 }
 
 /////////////////////////////////

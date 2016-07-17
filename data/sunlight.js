@@ -96,8 +96,12 @@ function initmap()
 		map = document.getElementById("map");
 		map.width = mapWidth;
 		map.height = mapHeight;
+		orbit = document.getElementById("orbit");	
+		orbit.width = mapWidth;
+		orbit.height = mapHeight;
 		drawDayNightMap(mapImage);
 		drawFootprint();
+		drawOrbit();
 		setInterval(function(){drawDayNightMap(mapImage);},60000);
 		setInterval(drawFootprint,1000);
 		};
@@ -116,6 +120,20 @@ function drawFootprint(){
 	ctx.strokeStyle = 'black';
 	drawCircle(ctx, pixelX(lon), pixelY(lat), 5, "#FF0000");
 	footprint(ctx);
+}
+
+function drawOrbit(){
+
+	var ctx = orbit.getContext("2d");
+	
+	ctx.clearRect(0, 0, orbit.width, orbit.height);
+	ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+	ctx.strokeStyle = 'yellow';
+	for (i=0;i<orbit_size;i++){
+		var lon = - orbitLon[i];
+		if (lon<0){lon += 360.0;}
+		ctx.strokeRect(pixelX(lon),pixelY(orbitLat[i]),1,1);
+	};
 }
 
 function drawDayNightMap(mapImage)
@@ -155,7 +173,7 @@ function drawDayNightMap(mapImage)
 	var lon = - parseFloat(document.getElementById("clon").innerHTML);
 	var lat = parseFloat(document.getElementById("clat").innerHTML);
 	if (lon<0){lon += 360.0;}
-	drawCircle(ctx, pixelX(lon), pixelY(lat), 3, "#FFFF00");        
+	drawCircle(ctx, pixelX(lon), pixelY(lat), 3, "#00ff00");        
 }		
 
 // Source: Henning Umland, http://www.celnav.de/longterm.htm

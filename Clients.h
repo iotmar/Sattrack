@@ -174,9 +174,11 @@ bool getTle(int ide, bool forceupdate){
     delete[] longstr1;
     delete[] longstr2;
     
-    if( satupdate || forceupdate){     
+    if( satupdate || forceupdate){   
       predError = !predictPasses();
       uint8_t buf[]="n";webSocket.broadcastBIN(buf,1); ///update websites
+      calcOrbit();
+      webSocketSendOrbit(); 
     }
     
     return true;
@@ -194,7 +196,7 @@ bool updateTime(){
     unixtime = temptime;
     timemillis = millis();
     jdtime = getJulianFromUnix(unixtime);
-    updatejdtime = jdtime + (1000.0 + random(1000))/24000.0;
+    updatejdtime = jdtime + (2000.0 + random(2000))/24000.0;  //update in 2-4 hours
     
     #ifdef DEBUG
       int year,mon,day,hr,min;
@@ -205,7 +207,7 @@ bool updateTime(){
     
     return true;
   }else{
-    updatejdtime = jdtime + 1.0/24.0/6.0;
+    updatejdtime = jdtime + 0.010417; //retry in 15 min
     return false;
   }
 }
