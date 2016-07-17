@@ -43,3 +43,5 @@ This device use the neopixels to show some status information.
 
 # Credits
 - [Sunlight World Map](https://github.com/GChristensen/sunligth-world-map-gadget) by GChristensen
+- Worldmap by NASA Earth Observatory
+
