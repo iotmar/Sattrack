@@ -63,7 +63,11 @@ void Animo::AnimStart(anim_mode m){
 
         case ANIM_WAIT:
           frame = 0;
-          if(status!=ANIM_WAIT){tick.detach();tick.attach_ms(100,animation);}
+          #if PIXELS > 7
+            if(status!=ANIM_WAIT){tick.detach();tick.attach_ms(100,animation);}
+          #else
+            if(status!=ANIM_WAIT){tick.detach();tick.attach_ms(150,animation);}
+          #endif
           break;
 
         case ANIM_FLASH:
@@ -82,11 +86,28 @@ void Animo::Animation(){
           break;
 
         case ANIM_WAIT:
-          bus->ClearTo(bcolor);
-          bus->SetPixelColor(frame, fcolor);
-          frame = (frame+1)%PIXELS;
-          bus->SetPixelColor(frame, fcolor);
-          if(bus->CanShow()){bus->Show();}
+          
+          if(bus->CanShow()){
+            
+              bus->ClearTo(bcolor);
+              
+              #ifdef IGNOREFIRSTPIXEL
+                bus->SetPixelColor(0, RgbColor(0,0,0));
+                bus->SetPixelColor(frame+1, fcolor);
+                frame = (frame+1)%(PIXELS-1);
+                #if PIXELS > 7
+                  bus->SetPixelColor(frame+1, fcolor);
+                #endif
+              #else
+                bus->SetPixelColor(frame, fcolor);
+                frame = (frame+1)%PIXELS;
+                #if PIXELS > 7
+                  bus->SetPixelColor(frame, fcolor);
+                #endif
+              #endif
+              
+              bus->Show();
+          }
       
           break;
 

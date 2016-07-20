@@ -110,7 +110,11 @@ void setup() {
         LedStrip.SetAnimColor(0x0,0x0,0x0,0x9f,0x0,0x0);
         LedStrip.AnimStart(ANIM_WAIT);
         dataError = true;
-        updatejdtime = getJulianTime() + 0.000694;   // retry update in 1 min
+        if (timeFlag && !TleFlag){
+            updatejdtime = getJulianTime() + 0.01417;   // retry update in 15 min
+        }else{
+             updatejdtime = getJulianTime() + 0.000694;   // retry update in 1 min
+        }
     }
   }
 
@@ -186,12 +190,20 @@ void loop() {
   }
   else if(WiFi.getMode() != WIFI_AP){  ///retry when failed getting data
       if (updatejdtime < jd){
-          if (!(updateTime() && getTle(config->satnum))){
+           
+          bool timeFlag = updateTime();
+          bool TleFlag = getTle(config->satnum);
+          
+          if (!(timeFlag && TleFlag)){
               #ifdef DEBUG
                 Serial.println("Can't get data");
                 Serial.println();
               #endif
-              updatejdtime = jd + 0.003472;   // retry update in 5 min
+              if (timeFlag && !TleFlag){
+                  updatejdtime = getJulianTime() + 0.01417;   // retry update in 15 min
+              }else{
+                   updatejdtime = getJulianTime() + 0.000694;   // retry update in 1 min
+              }
           }else{
               dataError = false;
               LedStrip.AnimStop();
