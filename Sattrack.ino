@@ -31,6 +31,7 @@
 void setup() {
 
   initConfig();
+  WiFi.hostname(config->host);
   
   strip.Begin();
   LedStrip.Begin(&strip);
