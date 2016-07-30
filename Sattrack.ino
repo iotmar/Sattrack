@@ -108,8 +108,8 @@ void setup() {
           Serial.println("Can't get data");
           Serial.println();
         #endif
-        LedStrip.SetAnimColor(0x0,0x0,0x0,0x9f,0x0,0x0);
-        LedStrip.AnimStart(ANIM_WAIT);
+        LedStrip.SetAnimColor(0x9f,0x0,0x0);
+        LedStrip.AnimStart(ANIM_FLASH);
         dataError = true;
         if (timeFlag && !TleFlag){
             updatejdtime = getJulianTime() + 0.01417;   // retry update in 15 min
@@ -177,15 +177,15 @@ void loop() {
         }
     }
 
-    if(jd > orbit.lastJd-orbit.step*(orbit_size/2-1)){
-        updateOrbit();
-        webSocketSendOrbit();
-    }
-
     if (millis() - socketrate > 33)
     {
         socketrate = millis();
         webSocketSendData();
+    }
+
+    if(jd > orbit.lastJd-orbit.step*(orbit_size/2-1)){
+        updateOrbit();
+        webSocketSendOrbit();
     }
     
   }
