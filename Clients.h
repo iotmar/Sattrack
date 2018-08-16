@@ -91,7 +91,7 @@ bool getTle(int ide, bool forceupdate){
       #endif
       return false;
     }
-    String line = "GET /cgi-bin/TLE.pl?CATNR=" + String(ide)+ " HTTP/1.1\r\nHost: celestrak.com\r\nConnection: close\r\n\r\n";
+    String line = "GET /satcat/tle.php?CATNR=" + String(ide)+ " HTTP/1.1\r\nHost: celestrak.com\r\nConnection: close\r\n\r\n";
     #ifdef DEBUG
       Serial.println(line);
     #endif
@@ -115,8 +115,9 @@ bool getTle(int ide, bool forceupdate){
     //Serial.println(line);
     while (client.available() && succes == false){
       line = client.readStringUntil('\n');
+      line.trim();
       //Serial.println(line);
-      if ( line == "<PRE>" ){
+      if ( line == "<PRE>" || line == "<pre>" ){
          succes = true;
       }
     }
@@ -127,15 +128,16 @@ bool getTle(int ide, bool forceupdate){
     char* naam = new char[25];
 
     line = client.readStringUntil('\n');
+    line.trim();
     strlcpy (naam, line.c_str(),25);
     line = client.readStringUntil('\n');
+    line.trim();
     strlcpy (longstr1, line.c_str(),80);
     line = client.readStringUntil('\n');
+    line.trim();
     strlcpy (longstr2, line.c_str(),80);
     
-    while(client.available()){
-      client.flush();
-    }
+    client.stop();
 
     if (longstr1[0] == '1' && longstr2[0] == '2'){
       #ifdef DEBUG
@@ -146,7 +148,6 @@ bool getTle(int ide, bool forceupdate){
       #ifdef DEBUG
         Serial.println("\r\nnot a correct api-response");
       #endif
-      client.stop();
       delete[] naam;
       delete[] longstr1;
       delete[] longstr2;
