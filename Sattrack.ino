@@ -79,8 +79,13 @@ void setup() {
   
   #ifdef DEBUG
     Serial.println();
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    if (!dataError) {
+        Serial.print("Local IP address: ");
+        Serial.println(WiFi.localIP());
+    } else {
+        Serial.print("SoftAP IP address: ");
+        Serial.println(WiFi.softAPIP());
+    }
     Serial.println();
   #endif
 
