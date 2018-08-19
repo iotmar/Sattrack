@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncTCP.h>
@@ -15,7 +13,6 @@
 #include <NeoPixelBus.h>
 #include <WebSocketsServer.h>
 #include <Hash.h>
-#include <Servo.h>
 #include "FS.h"
 #include "Globals.h"
 #include "Config.h"
@@ -26,8 +23,6 @@
 #include "Pixels.h"
 
 
-
-Servo myservo;
 
 ///////////////////////////////////
 //            Setup              //
@@ -84,8 +79,13 @@ void setup() {
 
   #ifdef DEBUG
     Serial.println();
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    if (!dataError) {
+        Serial.print("Local IP address: ");
+        Serial.println(WiFi.localIP());
+    } else {
+        Serial.print("SoftAP IP address: ");
+        Serial.println(WiFi.softAPIP());
+    }
     Serial.println();
   #endif
 
@@ -142,10 +142,7 @@ void setup() {
   #endif
 
   state=IDLE;
-  myservo.attach(4,500,2400);
 }
-
-
 
 //////////////////////////////////////
 //           Main loop              //
@@ -174,7 +171,7 @@ void loop() {
              uint8_t buf[]="n";webSocket.broadcastBIN(buf,1);  //notify clients that there is new data available
         }
 
-        if ( false){//updatejdtime < jd){  ///update tle and time
+        if ( updatejdtime < jd){  ///update tle and time
             if (passPredictions[0].jdstart - 0.5/sat.revpday > jd || passPredictions[0].jdstop + 0.1/sat.revpday < jd){
                 if (millis() > 2592000000){
                     ESP.restart();
@@ -185,13 +182,10 @@ void loop() {
         }
     }
 
-
-
     if (millis() - socketrate > 33)
     {
         socketrate = millis();
         webSocketSendData();
-        myservo.write(sat.satEl + 90);
     }
 
     if(jd > orbit.lastJd-orbit.step*(orbit_size/2-1)){
@@ -334,7 +328,7 @@ void loop() {
 
 
 double getJulianTime(){
-        return jdtime + (millis()-timemillis)*500/86400000.0;
+    return jdtime + (millis()-timemillis)/86400000.0;
 }
 
 

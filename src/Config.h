@@ -76,8 +76,8 @@ void setDefaultConfig(){
 
     config->ColorDayL = RgbColor(0,255,0);  //green
     config->ColorDayH = RgbColor(0,0,255);  //blue
-    config->ColorVisL = RgbColor(255,0,0);  //yellow
-    config->ColorVisH = RgbColor(0,255,0);  //white
+    config->ColorVisL = RgbColor(255,255,0);  //yellow
+    config->ColorVisH = RgbColor(255,255,255);  //white
     config->ColorEclL = RgbColor(0,0,255);  //blue
     config->ColorEclH = RgbColor(255,0,0);  //red
 
