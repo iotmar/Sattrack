@@ -12,17 +12,15 @@
 
 # External libraries
 - [Sgp4-Library](https://github.com/Hopperpop/Sgp4-Library)
-- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) by Links2004 (note: Enable AsyncTCP)
+- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) by Links2004
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) by Makuna
 - [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) by me-no-dev
 - [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) by me-no-dev
 
 # Installation instructions
 - Install platformIO.
-- Build to project to download the libraries.
-- Enable AsyncTCP in the WebSockets library. This mode can be activated in the file '.piolibdeps/WebSockets/WebSockets.h' (see WEBSOCKETS_NETWORK_TYPE define).
 - Compile and upload the code to your ESP.
-- Upload the data to SPIFFS (see [here](https://github.com/esp8266/Arduino/blob/master/doc/filesystem.md) for more information).
+- Upload the data to SPIFFS.
 - Wait until it opens an AP (indicated by a blue spinning wheel), and connect to "Sattrack" with password "123456789". (This can be changed in the settings.)
 - Go to [sattrack.local/settings.html](http://sattrack.local/settings.html) and change network settings. Save and restart.
 - Connect to your own AP and go back to the setting page. It will ask you to login.
