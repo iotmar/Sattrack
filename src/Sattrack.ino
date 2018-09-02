@@ -1,3 +1,4 @@
+#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266_ASYNC
 
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncTCP.h>
