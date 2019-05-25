@@ -19,20 +19,20 @@ bool getTle(int ide, bool forceupdate);
 struct ConfigStruct {
     boolean daylight;
     boolean dhcp;
-    
+
     uint8_t  IP[4];
     uint8_t  Netmask[4];
     uint8_t Gateway[4];
-    
+
     double lon;
     double lat;
     double alt;
     double offset;
     double sunoffset;
-  
+
     int8_t timezone;
     uint8_t version;
-    uint16_t satnum;
+    uint16_t satnum_old; //deprecated
 
     RgbColor ColorDayL;
     RgbColor ColorDayH;
@@ -40,19 +40,21 @@ struct ConfigStruct {
     RgbColor ColorVisH;
     RgbColor ColorEclL;
     RgbColor ColorEclH;
-    
+
     char ntpServerName[128];
     char password[64];
-    char ssid[32]; 
+    char ssid[32];
     char host[32];
     char ap_password[32];
+
+    uint32_t satnum;
 };
 
 ConfigStruct* config;
 
 
 void setDefaultConfig(){
-  
+
     strcpy(config->ssid,"SSID");
     config->password[0] = '\0';
     strcpy(config->host,"Sattrack");
@@ -61,13 +63,13 @@ void setDefaultConfig(){
     strcpy(config->ntpServerName, "0.be.pool.ntp.org");
     config->daylight = true;
     config->timezone = 1;
-    
+
     config->dhcp = true;
     config->IP[0]=192;config->IP[1]=168;config->IP[2]=1;config->IP[3]=100;
     config->Netmask[0]=255;config->Netmask[1]=255;config->Netmask[2]=255;config->Netmask[3]=0;
     config->Gateway[0]=192;config->Gateway[1]=168;config->Gateway[2]=1;config->Gateway[3]=1;
 
-    config->lat = 0.0; 
+    config->lat = 0.0;
     config->lon = 0.0;
     config->alt = 0.0;
     config->offset = 0.0;
@@ -90,11 +92,11 @@ void initConfig(){
   EEPROM.begin(sizeof(ConfigStruct));
 
   config = reinterpret_cast<ConfigStruct*>(EEPROM.getDataPtr());
-  
+
   if(config->version != CONFIGVERSION){
       setDefaultConfig();
   }
-  
+
 }
 
 ////////////////////////////////////
@@ -102,7 +104,7 @@ void initConfig(){
 ////////////////////////////////////
 
 RgbColor HexColorToRgb(String hexstring){
-  
+
   long number = strtol( &hexstring[1], NULL, 16);
 
   // Split them up into r, g, b values
@@ -118,15 +120,15 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
 
     int params = request->params();
     if (params > 0 ){
-      
+
       int part = request->getParam(0)->value().toInt();
-      
+
       if (part ==  1){
           config->dhcp = false;
       }else if (part == 3){
           config->daylight = false;
       }
-      
+
       for ( uint8_t i = 1; i < params; i++ ) {
 
           if (part == 1){
@@ -175,11 +177,11 @@ bool saveNetworkSettings(AsyncWebServerRequest *request){
       EEPROM.commit();
 
       return true;
-      
+
     }else{
        return false;
     }
-    
+
 }
 
 

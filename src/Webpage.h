@@ -55,7 +55,7 @@ void webSocketSendData(){
     secc = sec;
 
     uint8_t* buffer = new uint8_t[sizeof(double)*7+sizeof(int16_t)+sizeof(int)*3+1];
-    
+
     buffer[0]='p';
     memcpy(&buffer[1],&sat.satLon,sizeof(double));
     memcpy(&buffer[sizeof(double)+1],&sat.satLat,sizeof(double));
@@ -97,7 +97,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
                 Serial.printf("[%u] Disconnected!\n", num);
             #endif
             break;
-            
+
         case WStype_CONNECTED:
             #ifdef DEBUG
                 IPAddress ip = webSocket.remoteIP(num);
@@ -109,7 +109,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
                 webSocketSendOrbit(num);
             }
             break;
-            
+
     }
 
 }
@@ -124,28 +124,28 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
 
     int year,mon,day,hr,min;
     double sec;
-    
+
     Stringbuffer buf( 12 + 128*pred_size + 2*(80+12) + (12+18) + (9+25) + (2*23) + 3*15);
-    
+
     if (!(predError || err)){
         buf.add("tab|pass|18|");
         buf.add(pred_size);
-        
+
         for (int i = 0; i < pred_size; i++){
-          
+
           invjday(Predictions[i].jdstart ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
           buf.add("|");buf.add(day);buf.add(" ");buf.add(monstr[mon]);                                            //day
           buf.add("|");buf.addTime(hr,min,sec);                                                                   //starttime
           buf.add("|");buf.add(Predictions[i].azstart);                                                           //start azimuth
-          
+
           invjday(Predictions[i].jdmax ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
           buf.add("°|");buf.addTime(hr,min,sec);                                                                  //maxtime
           buf.add("|");buf.add(Predictions[i].maxelevation);                                                      //max elevation
-          
+
           invjday(Predictions[i].jdstop ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
           buf.add("°|");buf.addTime(hr,min,sec);                                                                  //stoptime
           buf.add("|");buf.add(Predictions[i].azstop);                                                            //stop azimuth
-          
+
           switch(Predictions[i].sight){                                                                           //visibility
                 case lighted:
                     buf.add("°|Visible");
@@ -170,7 +170,7 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
               buf.add("|1|");
             }
           }else{
-            buf.add("|-|-|-|-|");                                                                                                             
+            buf.add("|-|-|-|-|");
           }
 
           buf.add(Predictions[i].azmax);                                                                          //maxiumum azimuth
@@ -178,8 +178,8 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
           buf.add("|");buf.add((int)Predictions[i].visstop);                                                      //visibility stop
           buf.add("|");buf.add((int)Predictions[i].vismax);                                                       //visibility max
           buf.add("|");buf.add((int)Predictions[i].vistransit);                                                   //visibility transit
-          
-          
+
+
         }
         buf.add("\ninput|pre|");buf.add(getUnixFromJulian(Predictions[0].jdmax));
         buf.add("\ninput|next|");buf.add(getUnixFromJulian(Predictions[pred_size-1].jdmax));
@@ -193,17 +193,17 @@ void senddata(AsyncWebServerRequest *request,passinfo* Predictions, bool err){
     invjday(sat.satrec.jdsatepoch ,config->timezone,config->daylight , year, mon, day, hr, min, sec);
     buf.add("\ndiv|epoch|");buf.add(day);buf.add("/");buf.add(mon);buf.add("/");buf.add(year);buf.add(" ");buf.addTime(hr,min,sec);
     buf.add("\ndiv|sat|");buf.add(sat.satName);
-    
+
     buf.add("\ndiv|off|");buf.add(config->offset);
     buf.add("\ndiv|clat|");buf.add(config->lat);
     buf.add("\ndiv|clon|");buf.add(config->lon);
-    
+
     request->send ( 200, "text/plain", buf.getPointer());
 
     #ifdef DEBUG
       Serial.println("Send /data");
     #endif
-   
+
 }
 
 ///Handle request for data///
@@ -214,13 +214,13 @@ void checkdata(AsyncWebServerRequest *request){
     }else{
         int params = request->params();
         if (params > 0 && !predError){   ///check for extra arguments => request prediction
-          
+
             if (PredictRequest == NULL){
                 PredictRequest = request;    //calculation will be handeld in the main loop
             }else{   //already an calculation busy
                 request->send(503);
             }
-            
+
         }else{
             senddata(request, passPredictions, false); //send normal passPredictions
         }
@@ -237,9 +237,9 @@ void sendconfig(AsyncWebServerRequest *request){
         return;
       }
     }
-    
-    Stringbuffer buf(43*3 + 75 + 15*12 + 23*2 + 16*4 + 19*6 + 138 + 13 + 16*3 +  20);
-    
+
+    Stringbuffer buf(43*3 + 75 + 15*12 + 23*2 + 16*4 + 19*6 + 138 + 13 + 16*4 +  20);
+
     buf.add("input|SSID|");buf.add(config->ssid);
     buf.add("\ninput|HOST|");buf.add(config->host);
     buf.add("\ninput|PASS|");buf.add(config->ap_password);
@@ -261,7 +261,7 @@ void sendconfig(AsyncWebServerRequest *request){
     buf.add("\ninput|lat|");buf.add(config->lat,4);
     buf.add("\ninput|lon|");buf.add(config->lon,4);
     buf.add("\ninput|alt|");buf.add(config->alt);
-    buf.add("\ninput|sat|");buf.add(config->satnum);
+    buf.add("\ninput|sat|");buf.add((unsigned long)config->satnum);
     buf.add("\ninput|off|");buf.add(config->offset);
     buf.add("\ninput|sun|");buf.add(config->sunoffset);
 
@@ -274,10 +274,10 @@ void sendconfig(AsyncWebServerRequest *request){
 
     buf.add("\ninput|ts|");buf.add(config->ntpServerName);
     buf.add("\ninput|tz|");buf.add(config->timezone);
-    
+
     buf.add("\nchk|ds|");buf.add((config->daylight ? "checked" : ""));
     buf.add("\nchk|DHCP|");buf.add((config->dhcp ? "checked" : ""));
-    
+
     request->send ( 200, "text/plain", buf.getPointer() );
 
     #ifdef DEBUG
@@ -301,7 +301,7 @@ void initServer(){
     server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/favicon.ico","image/ico");});
     server.on("/map.jpg", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/map.jpg","image/jpg");});
     server.on("/microajax.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/microajax.js","text/javascript");});
-    server.on("/sunlight.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/sunlight.js","text/javascript");});  
+    server.on("/sunlight.js", HTTP_GET, [](AsyncWebServerRequest *request){request->send(SPIFFS, "/sunlight.js","text/javascript");});
     server.on("/config", HTTP_ANY, sendconfig);
     server.on("/data", HTTP_ANY, checkdata);
     server.on("/site.appcache", HTTP_GET,[](AsyncWebServerRequest *request)
@@ -309,7 +309,7 @@ void initServer(){
           response->addHeader("Cache-Control","max-age=86400");
           request->send(response);
         });
- 
+
     server.on("/settings.html", [](AsyncWebServerRequest *request){
 
         if ( WiFi.getMode() != WIFI_AP){
@@ -321,13 +321,13 @@ void initServer(){
 
         saveNetworkSettings(request);
         request->send(SPIFFS, "/settings.html","text/html");
- 
-        
+
+
     });
     server.onNotFound([](AsyncWebServerRequest *request){request->send(404);});
-   
+
     server.begin();
-    
+
 }
 
 void initWebsocket(){
@@ -336,7 +336,7 @@ void initWebsocket(){
 }
 
 void initMonths(){
- 
+
     strcpy(monstr[1], "Jan");
     strcpy(monstr[2], "Feb");
     strcpy(monstr[3], "Mar");
@@ -355,7 +355,7 @@ void initMonths(){
 void AnimStop();
 
 void initOTA(){
-  
+
     ArduinoOTA.onStart([]() {
       #ifdef DEBUG
         Serial.println("OTA Start");
@@ -363,22 +363,22 @@ void initOTA(){
       #ifdef DEBUG_frame
         ticker.detach();
       #endif
-      
+
       closeAllConnections();
-      
+
       LedStrip.AnimStop();
-      
+
     });
-    
+
     ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
        int pix = (progress / (total / PIXELS));
        RgbColor color = RgbColor(127,0,255);
        strip.SetPixelColor(pix, color);
        strip.Show();
     });
-    
-    
-    
+
+
+
     ArduinoOTA.onError([](ota_error_t error) {
       #ifdef DEBUG
         Serial.printf("Error[%u]: ", error);
@@ -394,7 +394,7 @@ void initOTA(){
 
       delay(3000);
       ESP.restart();
-      
+
     });
 
     #ifdef DEBUG
@@ -402,10 +402,9 @@ void initOTA(){
         Serial.println("OTA End");
       });
     #endif
-    
+
     ArduinoOTA.setHostname(config->host);
     ArduinoOTA.begin();
 }
 
 #endif
-
