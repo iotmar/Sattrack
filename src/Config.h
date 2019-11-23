@@ -14,7 +14,7 @@ bool getTle(int ide, bool forceupdate);
 
 //////////////////////////
 //  Config definition   //
-//////////////////////////
+////////////////////////// 
 
 struct ConfigStruct {
     boolean daylight;
@@ -60,7 +60,7 @@ void setDefaultConfig(){
     strcpy(config->host,"Sattrack");
     strcpy(config->ap_password,"123456789");
 
-    strcpy(config->ntpServerName, "0.be.pool.ntp.org");
+    strcpy(config->ntpServerName, "0.nl.pool.ntp.org");
     config->daylight = true;
     config->timezone = 1;
 

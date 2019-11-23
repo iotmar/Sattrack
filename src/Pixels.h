@@ -13,13 +13,13 @@ class Animo {
     Ticker tick;
     RgbColor fcolor;
     RgbColor bcolor;
-    NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod>* bus;
+    NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart1800KbpsMethod>* bus;
     anim_mode status;
     unsigned int frame;
 
   public:
 
-    void Begin(NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod>* s){bus = s;status = ANIM_STOP;};
+    void Begin(NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart1800KbpsMethod>* s){bus = s;status = ANIM_STOP;};
   
     void Animation();
 
